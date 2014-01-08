@@ -10,6 +10,10 @@ class Path
           backend.send mth, *args
         end
       end
+
+      def mock(*args, &block)
+        self.instance.mock *args, &block
+      end
     end
 
     attr_accessor :backend
@@ -17,16 +21,41 @@ class Path
       self.backend = Backend::Sys.new
     end
 
-    def mock
-      self.backend = Backend::Mock.new unless Backend::Mock === self.backend
+    def mock(opts = {}, &block)
+      if opts[:root]
+        # Use real file system scoped to given directory (chroot like)
+        if opts[:root] == :tmp
+          ::Dir.mktmpdir('rubypath') do |path|
+            use_backend Backend::Sys.new(path), &block
+          end
+        else
+          use_backend Backend::Sys.new(opts[:root]), &block
+        end
+      else
+        # Use mock FS
+        use_backend Backend::Mock.new, &block
+      end
     end
 
-    def unmock
-      self.backend = Backend::Sys.new unless Backend::Sys === self.backend
+    def use_backend(be)
+      old_backend, self.backend = self.backend, be
+      yield
+      self.backend = old_backend
     end
 
     delegate :expand_path
     delegate :getwd
+    delegate :exists?
+    delegate :mkdir
+    delegate :mkpath
+    delegate :directory?
+    delegate :file?
+    delegate :touch
+  end
+
+  def invoke_backend(mth, *args)
+    args << internal_path if args.empty?
+    Backend.instance.send mth, *args
   end
 
   require 'rubypath/backend/mock'
