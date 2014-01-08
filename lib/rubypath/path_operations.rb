@@ -1,5 +1,4 @@
 class Path
-
   #@!group Path Operations
 
   # Join path with given arguments.
@@ -84,7 +83,8 @@ class Path
   #   Path.new('.').dir
   #   #=> nil
   #
-  # @return [Path] Parent path.
+  # @return [Path|Nil] Parent path or nil if path already points to an absolute
+  #   or relative root.
   #
   def dir
     return nil if %w(. /).include? internal_path
@@ -95,52 +95,52 @@ class Path
   alias_method :dirname, :dir
   alias_method :parent, :dir
 
-  # # Yield given block for path and each ancestor.
-  # #
-  # # @example
-  # #
-  # def ascend
-  #   return to_enum(:ascend) unless block_given?
+  # Yield given block for path and each ancestor.
+  #
+  # @example
+  #
+  def ascend
+    return to_enum(:ascend) unless block_given?
 
-  #   path = self
-  #   begin
-  #     yield path
-  #   end while (path = path.dir)
-  #   self
-  # end
-  # alias_method :ancestors, :ascend
+    path = self
+    begin
+      yield path
+    end while (path = path.dir)
+    self
+  end
+  alias_method :ancestors, :ascend
 
-  # # Return given path as a relative path by just striping
-  # # leading slashes.
-  # #
-  # # @example
-  # #   Path.new('/path/to/file').as_relative
-  # #   #=> <Path 'path/to/file'>
-  # #
-  # # @return [Path] Path transformed to relative path.
-  # #
-  # def as_relative
-  #   if (rel_path = internal_path.gsub(/^\/+/, '')) != internal_path
-  #     self.class.new rel_path
-  #   else
-  #     self
-  #   end
-  # end
+  # Return given path as a relative path by just striping
+  # leading slashes.
+  #
+  # @example
+  #   Path.new('/path/to/file').as_relative
+  #   #=> <Path 'path/to/file'>
+  #
+  # @return [Path] Path transformed to relative path.
+  #
+  def as_relative
+    if (rel_path = internal_path.gsub(/^\/+/, '')) != internal_path
+      Path rel_path
+    else
+      self
+    end
+  end
 
-  # # Return given path as a absolute path by just
-  # # prepending a leading slash.
-  # #
-  # # @example
-  # #   Path.new('path/to/file').as_absolute
-  # #   #=> <Path '/path/to/file'>
-  # #
-  # # @return [Path] Path transformed to absolute path.
-  # #
-  # def as_absolute
-  #   if internal_path[0] != '/'
-  #     self.class.new "/#{internal_path}"
-  #   else
-  #     self
-  #   end
-  # end
+  # Return given path as a absolute path by just
+  # prepending a leading slash.
+  #
+  # @example
+  #   Path.new('path/to/file').as_absolute
+  #   #=> <Path '/path/to/file'>
+  #
+  # @return [Path] Path transformed to absolute path.
+  #
+  def as_absolute
+    if internal_path[0] != '/'
+      Path "/#{internal_path}"
+    else
+      self
+    end
+  end
 end

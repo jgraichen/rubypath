@@ -15,7 +15,7 @@ class Path
   #
   # @return [String] Useful object representation
   def inspect
-    "<#{self.class.name}:#{object_id} #{path.inspect}>"
+    "<#{self.class.name}:#{internal_path}>"
   end
 
 

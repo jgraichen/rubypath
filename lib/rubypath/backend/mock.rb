@@ -25,9 +25,9 @@ class Path::Backend
 
     # INIT
     def initialize
-      @user  = 'test'
-      @homes = {'test' => '/home/test', 'root' => '/root'}
-      @cwd   = '/'
+      @user  = 'root'
+      @homes = {'root' => '/root'}
+      @cwd   = '/root'
     end
 
     # OPERATIONS

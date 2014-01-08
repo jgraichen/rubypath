@@ -6,28 +6,26 @@ describe Path do
     let(:dotfile) { Path('/path/to/.dotfile') }
     let(:dotfile_ext) { Path('/path/to/.dotfile.en.sh') }
 
-    [:extensions, :exts].each do |mth|
-      describe "##{mth}" do
-        subject { path.send mth }
+    describe_aliases :extensions, :exts do
+      subject { path.send mth }
 
-        it 'should return all file extensions' do
-          should eq %w(de html slim)
+      it 'should return all file extensions' do
+        should eq %w(de html slim)
+      end
+
+      context 'dotfile w/o ext' do
+        let(:path) { dotfile }
+
+        it 'should not return dotfile name as extension' do
+          should eq Array.new
         end
+      end
 
-        context 'dotfile w/o ext' do
-          let(:path) { dotfile }
+      context 'dotfile with ext' do
+        let(:path) { dotfile_ext }
 
-          it 'should not return dotfile name as extension' do
-            should eq Array.new
-          end
-        end
-
-        context 'dotfile with ext' do
-          let(:path) { dotfile_ext }
-
-          it 'should only return dotfile extension' do
-            should eq %w(en sh)
-          end
+        it 'should only return dotfile extension' do
+          should eq %w(en sh)
         end
       end
     end
@@ -80,182 +78,192 @@ describe Path do
       end
     end
 
-    [:extension, :ext].each do |mth|
-      describe "##{mth}" do
-        subject { path.send mth }
+    describe_aliases :extension, :ext do
+      subject { path.send mth }
 
-        it 'should return last file extensions' do
-          should eq 'slim'
-        end
+      it 'should return last file extensions' do
+        should eq 'slim'
       end
     end
 
-    [:replace_extensions, :replace_exts].each do |mth|
-      describe "##{mth}" do
-        let(:path) { Path "#{base}file#{exts}" }
+    describe_aliases :replace_extensions, :replace_exts do
+      let(:path) { Path "#{base}file#{exts}" }
 
-        shared_examples 'extensions replacement' do
-          context 'with array' do
-            subject { path.send mth, %w(en txt) }
+      shared_examples 'extensions replacement' do
+        context 'with array' do
+          subject { path.send mth, %w(en txt) }
 
-            it 'should replace all file extensions' do
-              should eq "#{base}file.en.txt"
-            end
+          it 'should replace all file extensions' do
+            should eq "#{base}file.en.txt"
           end
 
-          context 'with multiple arguments' do
-            subject { path.send mth, *%w(en txt) }
+          it { should be_a Path }
+        end
 
-            it 'should replace all file extensions' do
-              should eq "#{base}file.en.txt"
-            end
+        context 'with multiple arguments' do
+          subject { path.send mth, *%w(en txt) }
+
+          it 'should replace all file extensions' do
+            should eq "#{base}file.en.txt"
           end
+
+          it { should be_a Path }
         end
+      end
 
-        shared_examples 'w/o ext' do
-          let(:exts)  { '' }
-          it_behaves_like 'extensions replacement'
+      shared_examples 'w/o ext' do
+        let(:exts)  { '' }
+        it_behaves_like 'extensions replacement'
 
-          context 'with replacement hash' do
-            subject { path.send mth, {'txt' => 'html'} }
+        context 'with replacement hash' do
+          subject { path.send mth, {'txt' => 'html'} }
 
-            it 'should replace all file extensions' do
-              should eq "#{base}file"
-            end
+          it 'should replace all file extensions' do
+            should eq "#{base}file"
           end
+
+          it { should be_a Path }
         end
+      end
 
-        shared_examples 'with single ext' do
-          let(:exts)  { '.txt' }
-          it_behaves_like 'extensions replacement'
+      shared_examples 'with single ext' do
+        let(:exts)  { '.txt' }
+        it_behaves_like 'extensions replacement'
 
-          context 'with replacement hash' do
-            subject { path.send mth, {'txt' => 'html'} }
+        context 'with replacement hash' do
+          subject { path.send mth, {'txt' => 'html'} }
 
-            it 'should replace all file extensions' do
-              should eq "#{base}file.html"
-            end
+          it 'should replace all file extensions' do
+            should eq "#{base}file.html"
           end
+
+          it { should be_a Path }
         end
+      end
 
-        shared_examples 'with multiple ext' do
-          let(:exts)  { '.en.html.slim' }
-          it_behaves_like 'extensions replacement'
+      shared_examples 'with multiple ext' do
+        let(:exts)  { '.en.html.slim' }
+        it_behaves_like 'extensions replacement'
 
-          context 'with replacement hash' do
-            subject { path.send mth, {'en' => 'de'} }
+        context 'with replacement hash' do
+          subject { path.send mth, {'en' => 'de'} }
 
-            it 'should replace all file extensions' do
-              should eq "#{base}file.de.html.slim"
-            end
+          it 'should replace all file extensions' do
+            should eq "#{base}file.de.html.slim"
           end
-        end
 
-        context 'with path' do
-          let(:base) { '/path/to/' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
+          it { should be_a Path }
         end
+      end
 
-        context 'with filename only' do
-          let(:base) { '' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'with path' do
+        let(:base) { '/path/to/' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
 
-        context 'with relative file path (I)' do
-          let(:base) { './' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'with filename only' do
+        let(:base) { '' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
 
-        context 'with relative file path (II)' do
-          let(:base) { 'path/' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'with relative file path (I)' do
+        let(:base) { './' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
+
+      context 'with relative file path (II)' do
+        let(:base) { 'path/' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
       end
     end
 
-    [:replace_extension, :replace_ext].each do |mth|
-      describe "##{mth}" do
-        let(:path) { Path "#{base}#{file}#{ext}" }
+    describe_aliases :replace_extension, :replace_ext do
+      let(:path) { Path "#{base}#{file}#{ext}" }
 
-        shared_examples 'extension replacement' do
-          context 'with array' do
-            subject { path.send mth, %w(mobile txt) }
+      shared_examples 'extension replacement' do
+        context 'with array' do
+          subject { path.send mth, %w(mobile txt) }
 
-            it 'should replace last file extensions' do
-              should eq "#{base}#{file}.mobile.txt"
-            end
+          it 'should replace last file extensions' do
+            should eq "#{base}#{file}.mobile.txt"
           end
 
-          context 'with multiple arguments' do
-            subject { path.send mth, *%w(mobile txt) }
+          it { should be_a Path }
+        end
 
-            it 'should replace last file extensions' do
-              should eq "#{base}#{file}.mobile.txt"
-            end
+        context 'with multiple arguments' do
+          subject { path.send mth, *%w(mobile txt) }
+
+          it 'should replace last file extensions' do
+            should eq "#{base}#{file}.mobile.txt"
           end
 
-          context 'with single string' do
-            subject { path.send mth, 'haml' }
+          it { should be_a Path }
+        end
 
-            it 'should replace last file extensions' do
-              should eq "#{base}#{file}.haml"
-            end
+        context 'with single string' do
+          subject { path.send mth, 'haml' }
+
+          it 'should replace last file extensions' do
+            should eq "#{base}#{file}.haml"
           end
-        end
 
-        shared_examples 'w/o ext' do
-          let(:file) { 'file'}
-          let(:ext)  { '' }
-          it_behaves_like 'extension replacement'
+          it { should be_a Path }
         end
+      end
 
-        shared_examples 'with single ext' do
-          let(:file) { 'file'}
-          let(:ext)  { '.txt' }
-          it_behaves_like 'extension replacement'
-        end
+      shared_examples 'w/o ext' do
+        let(:file) { 'file'}
+        let(:ext)  { '' }
+        it_behaves_like 'extension replacement'
+      end
 
-        shared_examples 'with multiple ext' do
-          let(:file) { 'file.de'}
-          let(:ext)  { '.txt' }
-          it_behaves_like 'extension replacement'
-        end
+      shared_examples 'with single ext' do
+        let(:file) { 'file'}
+        let(:ext)  { '.txt' }
+        it_behaves_like 'extension replacement'
+      end
 
-        context 'on path file' do
-          let(:base) { '/path/to/file/' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      shared_examples 'with multiple ext' do
+        let(:file) { 'file.de'}
+        let(:ext)  { '.txt' }
+        it_behaves_like 'extension replacement'
+      end
 
-        context 'on relative path file' do
-          let(:base) { 'to/file/' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'on path file' do
+        let(:base) { '/path/to/file/' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
 
-        context 'on relative root path file' do
-          let(:base) { './' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'on relative path file' do
+        let(:base) { 'to/file/' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
 
-        context 'on filename only' do
-          let(:base) { '' }
-          it_behaves_like 'w/o ext'
-          it_behaves_like 'with single ext'
-          it_behaves_like 'with multiple ext'
-        end
+      context 'on relative root path file' do
+        let(:base) { './' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
+      end
+
+      context 'on filename only' do
+        let(:base) { '' }
+        it_behaves_like 'w/o ext'
+        it_behaves_like 'with single ext'
+        it_behaves_like 'with multiple ext'
       end
     end
   end

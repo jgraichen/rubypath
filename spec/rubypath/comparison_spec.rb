@@ -4,36 +4,34 @@ describe Path do
   describe 'Comparison' do
     let(:path) { Path.new '/path/to/file' }
 
-    [:eql?, :==].each do |mth|
-      describe "##{mth}" do
-        context 'with Path object' do
-          it 'should compare paths (1)' do
-            expect(path.send(mth, described_class.new('/path/to/file'))).to eq true
-          end
-
-          it 'should compare paths (1)' do
-            expect(path.send(mth, described_class.new('/path/to/another/file'))).to eq false
-          end
+    describe_aliases :eql?, :== do
+      context 'with Path object' do
+        it 'should compare paths (1)' do
+          expect(path.send(mth, described_class.new('/path/to/file'))).to eq true
         end
 
-        context 'with String object' do
-          it 'should compare paths (1)' do
-            expect(path.send(mth, '/path/to/file')).to eq true
-          end
+        it 'should compare paths (1)' do
+          expect(path.send(mth, described_class.new('/path/to/another/file'))).to eq false
+        end
+      end
 
-          it 'should compare paths (1)' do
-            expect(path.send(mth, '/path/to/another/file')).to eq false
-          end
+      context 'with String object' do
+        it 'should compare paths (1)' do
+          expect(path.send(mth, '/path/to/file')).to eq true
         end
 
-        context 'with Pathname object' do
-          it 'should compare paths (1)' do
-            expect(path.send(mth, Pathname.new('/path/to/file'))).to eq true
-          end
+        it 'should compare paths (1)' do
+          expect(path.send(mth, '/path/to/another/file')).to eq false
+        end
+      end
 
-          it 'should compare paths (1)' do
-            expect(path.send(mth, Pathname.new('/path/to/another/file'))).to eq false
-          end
+      context 'with Pathname object' do
+        it 'should compare paths (1)' do
+          expect(path.send(mth, Pathname.new('/path/to/file'))).to eq true
+        end
+
+        it 'should compare paths (1)' do
+          expect(path.send(mth, Pathname.new('/path/to/another/file'))).to eq false
         end
       end
     end

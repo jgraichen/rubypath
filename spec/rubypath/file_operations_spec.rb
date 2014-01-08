@@ -4,13 +4,11 @@ describe Path do
   describe 'File Operations' do
     let(:path) { Path('/path/to/file.txt') }
 
-    [:name, :basename].each do |mth|
-      describe "##{mth}" do
-        subject { path.send mth }
+    describe_aliases :name, :basename do
+      subject { path.send mth }
 
-        it 'should return file name' do
-          should eq 'file.txt'
-        end
+      it 'should return file name' do
+        should eq 'file.txt'
       end
     end
 

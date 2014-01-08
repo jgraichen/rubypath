@@ -1,15 +1,19 @@
 class Path
+
   class << self
     #@!group Construction
 
-    # Creates new {Path}.
+    # Create new {Path}.
     #
     # If single argument is a path object it will be returned and no new one
-    # will be created.
+    # will be created. If not arguments are given {Path::EMPTY} will be
+    # returned.
     #
     # @see #initialize
     #
     def new(*args)
+      args.flatten!
+      return Path::EMPTY if args.empty?
       return args.first if args.size == 1 && self === args.first
       super
     end
@@ -78,7 +82,7 @@ class Path
 
   #@!group Construction
 
-  # Initializes new {Path} object.
+  # Initialize new {Path} object.
   #
   # Given arguments will be converted to String using `#to_path`, `#path` or
   # `#to_s` in this order if they return a String object.
@@ -89,8 +93,16 @@ class Path
     parts = args.flatten
     @path = if parts.size > 1
       ::File.join *parts.map {|p| Path.like_path p }
-    else
+    elsif parts.size == 1
       Path.like_path(parts.first).dup
+    else
+      ''
     end
   end
+
+  # Empty path.
+  #
+  # @return [Path] Empty path.
+  #
+  EMPTY = Path.new('')
 end
