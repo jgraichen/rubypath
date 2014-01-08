@@ -66,79 +66,30 @@ describe Path do
       end
     end
 
-    describe "#expand" do
-      let(:cwd) { '/working/dir' }
-      let(:base) { cwd }
-      let(:args) { Array.new }
-      before do
-        Path.mock do |root, back|
-          back.cwd = cwd
-          back.current_user = 'test'
-          back.homes = {'test' => '/home/test', 'otto' => '/srv/home/otto'}
-        end
-      end
-
-      shared_examples '#expand' do
-        subject { Path(path).expand(*args) }
-
-        it 'should invoke backend' do
-          path_args = args.reject{|a| Hash === a}
-          expect(Path::Backend.instance).to receive(:expand_path).with(Path(path).join(*path_args).path, base).and_call_original
-          subject
+    with_backends :mock, :sys do
+      describe_method :expand, aliases: [:expand_path, :absolute, :absolute_path] do
+        let(:cwd) { '/working/dir' }
+        let(:base) { cwd }
+        let(:args) { Array.new }
+        before do
+          Path.mock do |root, back|
+            back.cwd = cwd
+            back.current_user = 'test'
+            back.homes = {'test' => '/home/test', 'otto' => '/srv/home/otto'}
+          end
         end
 
-        it 'should expand path' do
-          expect(subject).to eq expanded_path
+        around{|example| Path::Backend.mock &example }
+
+        shared_examples '#expand' do
+          subject { Path(path).send(mth, *args) }
+
+          it 'should expand path' do
+            expect(subject).to eq expanded_path
+          end
+
+          it { should be_a Path }
         end
-
-        it { should be_a Path }
-      end
-
-      context '~' do
-        let(:path) { '~' }
-        let(:expanded_path) { '/home/test' }
-        it_behaves_like '#expand'
-      end
-
-      context '~/path' do
-        let(:path) { '~/path/to/file.txt' }
-        let(:expanded_path) { '/home/test/path/to/file.txt' }
-        it_behaves_like '#expand'
-      end
-
-      context '~user' do
-        let(:path) { '~otto' }
-        let(:expanded_path) { '/srv/home/otto' }
-        it_behaves_like '#expand'
-      end
-
-      context '~user/path' do
-        let(:path) { '~otto/path/to/file.txt' }
-        let(:expanded_path) { '/srv/home/otto/path/to/file.txt' }
-        it_behaves_like '#expand'
-      end
-
-      context '/abs/path' do
-        let(:path) { '/abs/path/to/file.txt' }
-        let(:expanded_path) { '/abs/path/to/file.txt' }
-        it_behaves_like '#expand'
-      end
-
-      context 'rel/path' do
-        let(:path) { 'rel/path/to/file.txt' }
-        let(:expanded_path) { '/working/dir/rel/path/to/file.txt' }
-        it_behaves_like '#expand'
-      end
-
-      context './path' do
-        let(:path) { './path/to/file.txt' }
-        let(:expanded_path) { '/working/dir/path/to/file.txt' }
-        it_behaves_like '#expand'
-      end
-
-      context 'with base option' do
-        let(:base) { '/base/./' }
-        let(:args) { [base: '/base/./'] }
 
         context '~' do
           let(:path) { '~' }
@@ -172,60 +123,107 @@ describe Path do
 
         context 'rel/path' do
           let(:path) { 'rel/path/to/file.txt' }
-          let(:expanded_path) { '/base/rel/path/to/file.txt' }
+          let(:expanded_path) { '/working/dir/rel/path/to/file.txt' }
           it_behaves_like '#expand'
         end
 
         context './path' do
           let(:path) { './path/to/file.txt' }
-          let(:expanded_path) { '/base/path/to/file.txt' }
-          it_behaves_like '#expand'
-        end
-      end
-
-      context 'with path args' do
-        let(:args) { ['..', 'fuu', 'net.txt'] }
-
-        context '~' do
-          let(:path) { '~' }
-          let(:expanded_path) { '/home/fuu/net.txt' }
+          let(:expanded_path) { '/working/dir/path/to/file.txt' }
           it_behaves_like '#expand'
         end
 
-        context '~/path' do
-          let(:path) { '~/path/to/file.txt' }
-          let(:expanded_path) { '/home/test/path/to/fuu/net.txt' }
-          it_behaves_like '#expand'
+        context 'with base option' do
+          let(:base) { '/base/./' }
+          let(:args) { [base: '/base/./'] }
+
+          context '~' do
+            let(:path) { '~' }
+            let(:expanded_path) { '/home/test' }
+            it_behaves_like '#expand'
+          end
+
+          context '~/path' do
+            let(:path) { '~/path/to/file.txt' }
+            let(:expanded_path) { '/home/test/path/to/file.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context '~user' do
+            let(:path) { '~otto' }
+            let(:expanded_path) { '/srv/home/otto' }
+            it_behaves_like '#expand'
+          end
+
+          context '~user/path' do
+            let(:path) { '~otto/path/to/file.txt' }
+            let(:expanded_path) { '/srv/home/otto/path/to/file.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context '/abs/path' do
+            let(:path) { '/abs/path/to/file.txt' }
+            let(:expanded_path) { '/abs/path/to/file.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context 'rel/path' do
+            let(:path) { 'rel/path/to/file.txt' }
+            let(:expanded_path) { '/base/rel/path/to/file.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context './path' do
+            let(:path) { './path/to/file.txt' }
+            let(:expanded_path) { '/base/path/to/file.txt' }
+            it_behaves_like '#expand'
+          end
         end
 
-        context '~user' do
-          let(:path) { '~otto' }
-          let(:expanded_path) { '/srv/home/fuu/net.txt' }
-          it_behaves_like '#expand'
-        end
+        context 'with path args' do
+          let(:args) { ['..', 'fuu', 'net.txt'] }
 
-        context '~user/path' do
-          let(:path) { '~otto/path/to/file.txt' }
-          let(:expanded_path) { '/srv/home/otto/path/to/fuu/net.txt' }
-          it_behaves_like '#expand'
-        end
+          context '~' do
+            let(:path) { '~' }
+            let(:expanded_path) { '/home/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
 
-        context '/abs/path' do
-          let(:path) { '/abs/path/to/file.txt' }
-          let(:expanded_path) { '/abs/path/to/fuu/net.txt' }
-          it_behaves_like '#expand'
-        end
+          context '~/path' do
+            let(:path) { '~/path/to/file.txt' }
+            let(:expanded_path) { '/home/test/path/to/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
 
-        context 'rel/path' do
-          let(:path) { 'rel/path/to/file.txt' }
-          let(:expanded_path) { '/working/dir/rel/path/to/fuu/net.txt' }
-          it_behaves_like '#expand'
-        end
+          context '~user' do
+            let(:path) { '~otto' }
+            let(:expanded_path) { '/srv/home/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
 
-        context './path' do
-          let(:path) { './path/to/file.txt' }
-          let(:expanded_path) { '/working/dir/path/to/fuu/net.txt' }
-          it_behaves_like '#expand'
+          context '~user/path' do
+            let(:path) { '~otto/path/to/file.txt' }
+            let(:expanded_path) { '/srv/home/otto/path/to/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context '/abs/path' do
+            let(:path) { '/abs/path/to/file.txt' }
+            let(:expanded_path) { '/abs/path/to/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context 'rel/path' do
+            let(:path) { 'rel/path/to/file.txt' }
+            let(:expanded_path) { '/working/dir/rel/path/to/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
+
+          context './path' do
+            let(:path) { './path/to/file.txt' }
+            let(:expanded_path) { '/working/dir/path/to/fuu/net.txt' }
+            it_behaves_like '#expand'
+          end
         end
       end
     end

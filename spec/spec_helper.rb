@@ -33,11 +33,7 @@ RSpec.configure do |config|
   # Raise error when using old :should expectation syntax.
   config.raise_errors_for_deprecations!
 
-  config.before(:each) do
-    Path.mock
-  end
-
-  config.after(:each) do
-    Path.unmock
+  config.around(:each) do |example|
+    Path::Backend.mock root: :tmp, &example
   end
 end

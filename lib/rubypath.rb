@@ -12,6 +12,7 @@ class Path
   require 'rubypath/path_operations'
   require 'rubypath/path_predicates'
   require 'rubypath/file_operations'
+  require 'rubypath/file_predicates'
   require 'rubypath/dir_operations'
 
   require 'rubypath/mock'

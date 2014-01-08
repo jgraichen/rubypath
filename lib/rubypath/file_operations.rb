@@ -8,4 +8,11 @@ class Path
     ::File.basename internal_path
   end
   alias_method :basename, :name
+
+  # TODO
+  def touch(*args)
+    with_path(*args) do |path|
+      invoke_backend :touch, path
+    end
+  end
 end

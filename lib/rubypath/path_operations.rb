@@ -55,6 +55,9 @@ class Path
       end
     end
   end
+  alias_method :expand_path, :expand
+  alias_method :absolute, :expand
+  alias_method :absolute_path, :expand
 
   # Check if path consists of only a filename.
   #
@@ -83,7 +86,7 @@ class Path
   #   Path.new('.').dir
   #   #=> nil
   #
-  # @return [Path|Nil] Parent path or nil if path already points to an absolute
+  # @return [Path] Parent path or nil if path already points to an absolute
   #   or relative root.
   #
   def dir
@@ -98,6 +101,24 @@ class Path
   # Yield given block for path and each ancestor.
   #
   # @example
+  #   Path('/path/to/file.txt').ascend{|path| p path}
+  #   #<Path:/path/to/file.txt>
+  #   #<Path:/path/to>
+  #   #<Path:/path>
+  #   #<Path:/>
+  #   #=> <Path:/path/to/file.txt>
+  #
+  # @example
+  #   Path('path/to/file.txt').ascend{|path| p path}
+  #   #<Path:path/to/file.txt>
+  #   #<Path:path/to>
+  #   #<Path:path>
+  #   #<Path:.>
+  #   #=> <Path:path/to/file.txt>
+  #
+  # @yield |path| Yield path and ancestors.
+  # @yieldparam path [Path] Path or ancestor.
+  # @return [Path] Self.
   #
   def ascend
     return to_enum(:ascend) unless block_given?
@@ -110,8 +131,7 @@ class Path
   end
   alias_method :ancestors, :ascend
 
-  # Return given path as a relative path by just striping
-  # leading slashes.
+  # Return given path as a relative path by just striping leading slashes.
   #
   # @example
   #   Path.new('/path/to/file').as_relative
@@ -127,8 +147,7 @@ class Path
     end
   end
 
-  # Return given path as a absolute path by just
-  # prepending a leading slash.
+  # Return given path as a absolute path by just prepending a leading slash.
   #
   # @example
   #   Path.new('path/to/file').as_absolute
