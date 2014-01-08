@@ -57,6 +57,18 @@ class Path
     end
   end
 
+  # Check if path consists of only a filename.
+  #
+  # @example
+  #   Path('file.txt').only_filename?
+  #   #=> true
+  #
+  # @return [Boolean] True if path consists of only a filename.
+  #
+  def only_filename?
+    internal_path.index(Path.separator).nil?
+  end
+
   # Return path to parent directory. If path is already an absolute or relative
   # root nil will be returned.
   #
