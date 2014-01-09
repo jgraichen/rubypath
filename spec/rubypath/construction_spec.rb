@@ -7,7 +7,7 @@ describe Path do
     let(:path) { described_class.new *args }
     subject { path }
 
-    describe_aliases :path, :to_path, :to_s do
+    describe_method :path, aliases: [:to_path, :to_s] do
       subject { path.send mth }
 
       it { should eq str }

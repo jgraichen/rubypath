@@ -2,11 +2,11 @@ class Path
   class << self
     #@!group Mocking / Virtual File System
 
-    # Operate on current path backend. Can be used to configure specified
-    # test scenario. If no virtual or scoped path backend set the default one
-    # will be used.
+    # Configure current path backend. Can be used to configure specified
+    # test scenario. If no virtual or scoped path backend is set the default
+    # one will be used.
     #
-    # Do not forget to set your path backend in test helper.
+    # Do not forget to use mock file system in your specs:
     # See more {Backend.mock}.
     #
     #     around do |example|
@@ -29,6 +29,10 @@ class Path
     #     backend.homes = {'test' => '/path/to/test/home'}
     #     #...
     #   end
+    #
+    # @yield |root, backend| Yield file system root path and current backend.
+    # @yieldparam root [Path] Root path of current packend.
+    # @yieldparam backend [Backend] Current backend.
     #
     def mock(opts = {})
       yield Path('/'), Backend.instance.backend if block_given?

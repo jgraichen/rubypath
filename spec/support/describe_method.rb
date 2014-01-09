@@ -5,7 +5,8 @@ module DescribeMethod
 
       describe(name) do
         let(:mth) { mth }
-      end.class_eval &block
+        module_eval &block
+      end
     end
   end
 

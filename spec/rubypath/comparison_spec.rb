@@ -4,7 +4,7 @@ describe Path do
   describe 'Comparison' do
     let(:path) { Path.new '/path/to/file' }
 
-    describe_aliases :eql?, :== do
+    describe_method :eql?, aliases: [:==] do
       context 'with Path object' do
         it 'should compare paths (1)' do
           expect(path.send(mth, described_class.new('/path/to/file'))).to eq true

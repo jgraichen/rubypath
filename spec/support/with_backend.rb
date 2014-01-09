@@ -11,12 +11,13 @@ module WithBackend
         raise ArgumentError.new 'Unknown backend.'
       end
 
-      ctx = describe "with #{backend.upcase} FS" do
+      describe "with #{backend.upcase} FS" do
         around do |example|
           be.call(example)
         end
+
+        module_eval &block
       end
-      ctx.class_eval &block
     end
   end
 
