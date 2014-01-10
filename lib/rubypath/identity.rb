@@ -9,6 +9,7 @@ class Path
     internal_path.dup
   end
   alias_method :to_path, :path
+  alias_method :to_str, :path
   alias_method :to_s, :path
 
   # Return a useful object string representation.
@@ -50,9 +51,9 @@ class Path
   #
   def with_path(*args)
     if args.any?
-      yield join(*args).internal_path
+      yield join(*args)
     else
-      yield internal_path
+      yield self
     end
   end
 end

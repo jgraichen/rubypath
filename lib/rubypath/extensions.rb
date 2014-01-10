@@ -72,7 +72,10 @@ class Path
     end
   end
 
-  # @overload replace_extensions(Array<String>)
+  # Replace file extensions with given new ones or by a given
+  # translation map.
+  #
+  # @overload replace_extensions(exts)
   #   Replace all extensions with given new ones. Number of given extensions
   #   does not need to match number of existing extensions.
   #
@@ -84,7 +87,9 @@ class Path
   #     Path('file.de.mobile.html.haml').replace_extensions(%w(int txt))
   #     #=> <Path "file.int.txt">
   #
-  # @overload replace_extensions(String, [String, ...])
+  #   @param exts [Array<String>] New extensions.
+  #
+  # @overload replace_extensions(ext, [ext, [..]])
   #   Replace all extensions with given new ones. Number of given extensions
   #   does not need to match number of existing extensions.
   #
@@ -100,12 +105,16 @@ class Path
   #     Path('file.de.txt').replace_extensions('html')
   #     #=> <Path "file.html">
   #
-  # @overload replace_extensions(Hash<String, String>)
+  #   @param ext [String] New extensions.
+  #
+  # @overload replace_extensions(map)
   #   Replace all matching extensions.
   #
   #   @example
   #     Path('file.de.html.haml').replace_extensions('de' => 'en', 'haml' => 'slim')
   #     #=> <Path "file.en.html.slim">
+  #
+  #   @param map [Hash<String, String>] Translation map as hash.
   #
   # @return [Path] Path to new filename.
   #

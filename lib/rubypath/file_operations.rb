@@ -20,8 +20,63 @@ class Path
   # @return [Path] Path to touched file.
   #
   def touch(*args)
-    invoke_backend :touch, path
-    self
+    with_path(*args) do |path|
+      invoke_backend :touch, path
+      Path path
+    end
+  end
+
+  # Create a file at pointed location and all missing parent directories.
+  #
+  # Given arguments will be joined with current path before directories and
+  # file is created.
+  #
+  # If file already exists nothing will be done.
+  #
+  # @example
+  #   Path('/path/to/file.txt').mkfile
+  #   #=> <Path:"/path/to/file.txt">
+  #
+  # @example
+  #   Path('/').mkfile('path', 'to', 'file.txt')
+  #   #=> <Path:"/path/to/file.txt">
+  #
+  # @return [Path] Path to created or existent file.
+  #
+  def mkfile(*args)
+    with_path(*args) do |path|
+      path.dir.mkpath if !path.exists? && path.dir && !path.dir.exists?
+      if path.exists?
+        raise Errno::ENOENT.new path.to_s unless path.file?
+      else
+        path.touch
+      end
+    end
+  end
+
+  # Search for a file in current directory or parent directories.
+  #
+  # Given search pattern can either be a regular expression or a shell glob
+  # expression.
+  #
+  # @param pattern [String|RegExp] Expression file name must match.
+  # @return [Path] Path to found file or nil.
+  #
+  def lookup(pattern)
+    ascend do |path|
+      case pattern
+      when String
+        path.entries.each do |c|
+          return path.join(c) if ::File.fnmatch?(pattern, c.name)
+        end
+      when Regexp
+        path.entries.each do |c|
+          return path.join(c) if pattern =~ c.name
+        end
+      end
+    end
+
+    nil
   end
 
   # TODO

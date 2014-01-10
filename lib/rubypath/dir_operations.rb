@@ -29,6 +29,15 @@ class Path
     end
   end
 
+  # Create directory and all missing parent directories.
+  #
+  # Given arguments will be joined with current path before directories
+  # are created.
+  #
+  # @return [Path] Path to created directory.
+  # @see #mkdir
+  # @see ::FileUtils.mkdir_p
+  #
   def mkpath(*args)
     with_path(*args) do |path|
       Backend.instance.mkpath path
@@ -36,4 +45,15 @@ class Path
     end
   end
   alias_method :mkdir_p, :mkpath
+
+  # Return list of entries in directory. That includes special directories
+  # (`.`, `..`).
+  #
+  # Given arguments will be joined before children are listed for directory.
+  #
+  # @return [Array<Path>] Entries in directory.
+  #
+  def entries(*args)
+    invoke_backend(:entries, internal_path).map(&Path)
+  end
 end

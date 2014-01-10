@@ -76,6 +76,37 @@ describe Path do
 
         it { should be_a Path }
       end
+
+      describe_method :entries do
+        let(:path) { Path '/' }
+        let(:args) { Array.new }
+        subject { path.send described_method, *args }
+
+        context 'with directory with children' do
+          before do
+            path.touch 'file.a'
+            path.touch 'file.b'
+            path.mkdir 'dir.a'
+            path.mkdir 'dir.b'
+          end
+
+          it 'should list of entries' do
+            expect(subject).to match_array %w(.. . file.a file.b dir.a dir.b)
+          end
+
+          it 'should return list of Path objects' do
+            subject.each{|e| expect(e).to be_a Path }
+          end
+        end
+
+        context 'with non-existent directory' do
+          let(:path) { Path '/non-existent-dir' }
+
+          it 'should raise error' do
+            expect { subject }.to raise_error(Errno::ENOENT, "No such file or directory - /non-existent-dir")
+          end
+        end
+      end
     end
   end
 end

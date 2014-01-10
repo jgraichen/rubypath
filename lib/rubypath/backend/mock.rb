@@ -130,6 +130,11 @@ class Path::Backend
       content
     end
 
+    def entries(path)
+      node = lookup_dir! path
+      node.children.map(&:name) + %w(. ..)
+    end
+
     #@!group Internal Virtual File System
 
     # Return root node.
@@ -174,7 +179,11 @@ class Path::Backend
 
     def lookup_parent!(path)
       if (node = lookup ::File.dirname expand_path path)
-        return node if Dir === node
+        if Dir === node
+          return node
+        else
+          raise Errno::ENOTDIR.new path
+        end
       end
       raise Errno::ENOENT.new path
     end

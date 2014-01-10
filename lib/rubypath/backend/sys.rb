@@ -32,6 +32,8 @@ class Path::Backend
       raise Errno::ENOENT.new path
     rescue Errno::EISDIR => ex
       raise Errno::EISDIR.new path
+    rescue Errno::ENOTDIR => ex
+      raise Errno::ENOTDIR.new path
     end
 
     ## OPERATIONS
@@ -82,6 +84,10 @@ class Path::Backend
 
     def atime(path)
       fs path, ::File, :atime, r(path)
+    end
+
+    def entries(path)
+      fs path, ::Dir, :entries, r(path)
     end
   end
 end

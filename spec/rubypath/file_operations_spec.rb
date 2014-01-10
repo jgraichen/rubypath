@@ -16,34 +16,52 @@ describe Path do
       describe_method :touch do
         let(:path) { Path '/rubypath' }
         let(:args) { Array.new }
+        let(:expected_path) { path }
         subject { path.touch *args }
         before { expect(path).to_not be_existent }
 
-        it 'should create file' do
-          subject
-          expect(path).to be_existent
-        end
-
-        it 'should update modification time' do
-          subject
-          expect(path.mtime).to be_within(1).of(Time.now)
-        end
-
-        context 'with existing file' do
-          before do
-            path.write 'ABC'
-            path.mtime = Time.now - 3600
+        shared_examples '#touch' do
+          it 'should create file' do
+            subject
+            expect(expected_path).to be_existent
           end
-          before { expect(path.mtime).to be < (Time.now - 30) }
 
           it 'should update modification time' do
             subject
-            expect(path.mtime).to be_within(1).of(Time.now)
+            expect(expected_path.mtime).to be_within(1).of(Time.now)
           end
+        end
+
+        shared_examples '#touch with existing file' do
+          before do
+            expected_path.write 'ABC'
+            expected_path.mtime = Time.now - 3600
+          end
+          before { expect(expected_path.mtime).to be < (Time.now - 30) }
+
+          it_behaves_like "#touch"
 
           it 'should not change content' do
             subject
-            expect(path.read).to eq 'ABC'
+            expect(expected_path.read).to eq 'ABC'
+          end
+        end
+
+        it_behaves_like '#touch with existing file'
+
+        context 'with args' do
+          let(:args) { '../file' }
+          let(:expected_path) { Path '/file' }
+
+          it_behaves_like '#touch with existing file'
+        end
+
+        context 'with existing file in path' do
+          let(:path) { super().join('file') }
+          before { path.dir.write 'ABC' }
+
+          it 'should raise ENOTDIR error' do
+            expect { subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /rubypath/file")
           end
         end
 
@@ -65,84 +83,135 @@ describe Path do
           let(:path) { Path '/dir/file' }
 
           it 'should raise ENOENT error' do
-            expect { subject }.to raise_error(Errno::ENOENT, "No such file or directory - /dir/file")
+            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /dir/file")
           end
         end
       end
 
-      # describe ".lookup" do
-      #   before do
-      #     Path.mock do |r|
-      #       r.mkpath 'a/b/c/d'
-      #       r.touch 'a/test.txt'
-      #       r.touch 'a/b/c/config.yaml'
-      #       r.touch 'a/config.yml'
-      #     end
-      #   end
-      #   let(:path) { Path('/') }
+      describe_method :mkfile do
+        let(:path) { Path '/path/to/file.txt' }
+        let(:args) { Array.new }
+        let(:expected_path) { path.dup }
+        subject { path.send described_method, *args }
 
-      #   context "with filename" do
-      #     it "should find file in current directory" do
-      #       expect(path.join('a').lookup("test.txt")).to eq fixture_path '/a/test.txt'
-      #     end
+        shared_examples '#mkfile' do
+          it 'should create all missing directories' do
+            expect{ subject }.to change{ expected_path.dir.directory? }.from(false).to(true)
+          end
 
-      #     it "should find file in parent directory" do
-      #       expect(path.join(%w(a b)).lookup("test.txt")).to eq fixture_path '/a/test.txt'
-      #     end
+          it 'should create file' do
+            expect{ subject }.to change{ expected_path.file? }.from(false).to(true)
+          end
+        end
 
-      #     it "should find file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup("test.txt")).to eq fixture_path '/a/test.txt'
-      #     end
+        it_behaves_like '#mkfile'
 
-      #     it "should find first file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup("config.yaml")).to eq fixture_path '/a/b/c/config.yaml'
-      #     end
-      #   end
+        context 'with args' do
+          let(:args) { %w(sub file) }
+          let(:expected_path) { Path '/path/to/file.txt/sub/file'}
 
-      #   context "with glob" do
-      #     it "should find file in current directory" do
-      #       expect(path.join('a').lookup('test.*')).to eq fixture_path '/a/test.txt'
-      #     end
+          it_behaves_like '#mkfile'
+        end
 
-      #     it "should find file in parent directory" do
-      #       expect(path.join("a/b").lookup('test.*')).to eq fixture_path '/a/test.txt'
-      #     end
+        context 'with existing directory' do
+          before { path.mkpath }
 
-      #     it "should find file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup('test.*')).to eq fixture_path '/a/test.txt'
-      #     end
+          it 'should raise ENOENT error' do
+            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /path/to/file.txt")
+          end
+        end
 
-      #     it "should find first file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup('config.*')).to eq fixture_path '/a/b/c/config.yaml'
-      #     end
+        context 'with existing file in path' do
+          before { path.dir.dir.mkpath; path.dir.touch }
 
-      #     it "should find first file that match" do
-      #       expect(path.join("a/b").lookup('*.yml')).to eq fixture_path '/a/config.yml'
-      #     end
-      #   end
+          it 'should raise EISDIR error' do
+            expect{ subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /path/to/file.txt")
+          end
+        end
 
-      #   context "with regexp" do
-      #     it "should find file in current directory" do
-      #       expect(path.join('a').lookup(/^test\.txt$/)).to eq fixture_path '/a/test.txt'
-      #     end
+        context 'with absolute root dir as path' do
+          let(:path) { Path '/' }
 
-      #     it "should find file in parent directory" do
-      #       expect(path.join("a/b").lookup(/^test\.txt$/)).to eq fixture_path '/a/test.txt'
-      #     end
+          it 'should raise EISDIR error' do
+            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /")
+          end
+        end
+      end
 
-      #     it "should find file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup(/^test\.txt$/)).to eq fixture_path '/a/test.txt'
-      #     end
+      describe_method :lookup do
+        before do
+          Path.mock do |r|
+            r.mkpath 'a/b/c/d'
+            r.touch 'a/test.txt'
+            r.touch 'a/b/c/config.yaml'
+            r.touch 'a/config.yml'
+          end
+        end
+        let(:path) { Path('/') }
 
-      #     it "should find first file in ancestor directory" do
-      #       expect(path.join("a/b/c/d").lookup(/^config\.yaml$/)).to eq fixture_path '/a/b/c/config.yaml'
-      #     end
+        context "with filename" do
+          it "should find file in current directory" do
+            expect(path.join('a').send(described_method, "test.txt")).to eq '/a/test.txt'
+          end
 
-      #     it "should find first file that match" do
-      #       expect(path.join("a/b").lookup(/^config\.ya?ml$/)).to eq fixture_path '/a/config.yml'
-      #     end
-      #   end
-      # end
+          it "should find file in parent directory" do
+            expect(path.join(%w(a b)).send(described_method, "test.txt")).to eq '/a/test.txt'
+          end
+
+          it "should find file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, "test.txt")).to eq '/a/test.txt'
+          end
+
+          it "should find first file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, "config.yaml")).to eq '/a/b/c/config.yaml'
+          end
+        end
+
+        context "with glob" do
+          it "should find file in current directory" do
+            expect(path.join('a').send(described_method, 'test.*')).to eq '/a/test.txt'
+          end
+
+          it "should find file in parent directory" do
+            expect(path.join("a/b").send(described_method, 'test.*')).to eq '/a/test.txt'
+          end
+
+          it "should find file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, 'test.*')).to eq '/a/test.txt'
+          end
+
+          it "should find first file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, 'config.*')).to eq '/a/b/c/config.yaml'
+          end
+
+          it "should find first file that match" do
+            expect(path.join("a/b").send(described_method, '*.yml')).to eq '/a/config.yml'
+          end
+        end
+
+        context "with regexp" do
+          it "should find file in current directory" do
+            expect(path.join('a').send(described_method, /^test\.txt$/)).to eq '/a/test.txt'
+          end
+
+          it "should find file in parent directory" do
+            expect(path.join("a/b").send(described_method, /^test\.txt$/)).to eq '/a/test.txt'
+          end
+
+          it "should find file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, /^test\.txt$/)).to eq '/a/test.txt'
+          end
+
+          it "should find first file in ancestor directory" do
+            expect(path.join("a/b/c/d").send(described_method, /^config\.yaml$/)).to eq '/a/b/c/config.yaml'
+          end
+
+          it "should find first file that match" do
+            expect(path.join("a/b").send(described_method, /^config\.ya?ml$/)).to eq '/a/config.yml'
+          end
+        end
+      end
+
     end
   end
 end

@@ -55,6 +55,7 @@ class Path
     delegate :read
     delegate :mtime
     delegate :mtime=
+    delegate :entries
   end
 
   private
