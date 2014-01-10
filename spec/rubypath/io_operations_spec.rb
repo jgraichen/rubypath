@@ -63,22 +63,28 @@ describe Path do
         let(:args) { Array.new }
         subject { path.send described_method, 'CONTENT', *args }
 
-        context 'with existing file' do
-          before { path.touch }
-
+        shared_examples '#write' do
           it 'should write content' do
             subject
-            expect(path.read).to eq 'CONTENT'
+            expect(path.read).to eq expected_content
           end
+
+          it { should be_a Path }
+          it { expect(subject.path).to eq path.path}
+        end
+
+        context 'with existing file' do
+          before { path.touch }
+          let(:expected_content) { 'CONTENT' }
+
+          it_behaves_like '#write'
 
           context 'with offset' do
             before { path.write '12345678901234567890' }
             let(:args) { [4] }
+            let(:expected_content) { '1234CONTENT234567890' }
 
-            it 'should offset content' do
-              subject
-              expect(path.read).to eq '1234CONTENT234567890'
-            end
+            it_behaves_like '#write'
           end
         end
 
@@ -92,16 +98,9 @@ describe Path do
 
         context 'with non-existing file' do
           before { expect(path).to_not be_existent }
+          let(:expected_content) { 'CONTENT' }
 
-          it 'should create file' do
-            subject
-            expect(path).to be_file
-          end
-
-          it 'should write content' do
-            subject
-            expect(path.read).to eq 'CONTENT'
-          end
+          it_behaves_like '#write'
         end
       end
 

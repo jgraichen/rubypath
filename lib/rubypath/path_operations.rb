@@ -30,15 +30,19 @@ class Path
   #
   # @example
   #   Path('path/to/../tmp').expand
-  #   #=> <Path "path/tmp">
+  #   #=> <Path:"path/tmp">
   #
   # @example
   #   Path('~/tmp').expand
-  #   #=> <Path "/home/user/tmp">
+  #   #=> <Path:"/home/user/tmp">
   #
   # @example
   #   Path('~oma/tmp').expand
-  #   #=> <Path "/home/oma/tmp">
+  #   #=> <Path:"/home/oma/tmp">
+  #
+  # @example
+  #   Path('~/tmp').expand('../file.txt')
+  #   #=> <Path:"/home/user/file.txt">
   #
   # @return [Path] Expanded path.
   # @see ::File#expand_path
