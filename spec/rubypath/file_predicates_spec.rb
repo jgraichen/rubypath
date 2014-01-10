@@ -6,7 +6,7 @@ describe Path do
       describe_method :file? do
         let(:path) { Path '/file.txt' }
         before { expect(path).to_not be_existent }
-        subject { path.send(mth) }
+        subject { path.send(described_method) }
 
         context 'with existing file' do
           before { path.touch }
@@ -26,7 +26,7 @@ describe Path do
       describe_method :directory?, aliases: [:dir?] do
         let(:dir) { Path '/dir' }
         before { expect(dir).to_not be_existent }
-        subject { dir.send(mth) }
+        subject { dir.send(described_method) }
 
         context 'with existing directory' do
           before { dir.mkdir }

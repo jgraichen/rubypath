@@ -8,7 +8,7 @@ describe Path do
     subject { path }
 
     describe_method :path, aliases: [:to_path, :to_s] do
-      subject { path.send mth }
+      subject { path.send described_method }
 
       it { should eq str }
 

@@ -6,7 +6,7 @@ describe Path do
       let(:path) { Path('/path/to/file.txt') }
 
       describe_method :name, aliases: [:basename] do
-        subject { path.send mth }
+        subject { path.send described_method }
 
         it 'should return file name' do
           should eq 'file.txt'
@@ -17,11 +17,56 @@ describe Path do
         let(:path) { Path '/rubypath' }
         let(:args) { Array.new }
         subject { path.touch *args }
-        before { expect(path).to_not be_exist }
+        before { expect(path).to_not be_existent }
 
-        it 'should invoke backend' do
-          expect(Path::Backend.instance).to receive(:touch).with(path.path).and_call_original
+        it 'should create file' do
           subject
+          expect(path).to be_existent
+        end
+
+        it 'should update modification time' do
+          subject
+          expect(path.mtime).to be_within(1).of(Time.now)
+        end
+
+        context 'with existing file' do
+          before do
+            path.write 'ABC'
+            path.mtime = Time.now - 3600
+          end
+          before { expect(path.mtime).to be < (Time.now - 30) }
+
+          it 'should update modification time' do
+            subject
+            expect(path.mtime).to be_within(1).of(Time.now)
+          end
+
+          it 'should not change content' do
+            subject
+            expect(path.read).to eq 'ABC'
+          end
+        end
+
+        context 'with existing directory' do
+          before do
+            path.mkdir
+            path.mtime = Time.now - 3600
+          end
+          before { expect(path).to be_directory }
+          before { expect(path.mtime).to be < (Time.now - 30) }
+
+          it 'should should update modification time' do
+            subject
+            expect(path.mtime).to be_within(1).of(Time.now)
+          end
+        end
+
+        context 'with file in non-existent directory' do
+          let(:path) { Path '/dir/file' }
+
+          it 'should raise ENOENT error' do
+            expect { subject }.to raise_error(Errno::ENOENT, "No such file or directory - /dir/file")
+          end
         end
       end
 

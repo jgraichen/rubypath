@@ -82,7 +82,7 @@ describe Path do
         around{|example| Path::Backend.mock &example }
 
         shared_examples '#expand' do
-          subject { Path(path).send(mth, *args) }
+          subject { Path(path).send(described_method, *args) }
 
           it 'should expand path' do
             expect(subject).to eq expanded_path
@@ -233,7 +233,7 @@ describe Path do
         context 'with block' do
           it 'should yield each part path' do
             received_paths = []
-            path.send(mth) do |path|
+            path.send(described_method) do |path|
               received_paths << path
             end
 
@@ -241,7 +241,7 @@ describe Path do
           end
 
           it 'should yield Path objects' do
-            path.send(mth) do |part|
+            path.send(described_method) do |part|
               expect(part).to be_a Path
             end
           end
@@ -249,15 +249,15 @@ describe Path do
 
         context 'w/o block' do
           it 'should return enumerable' do
-            expect(path.send(mth)).to be_a Enumerable
+            expect(path.send(described_method)).to be_a Enumerable
           end
 
           it 'should enum part paths' do
-            expect(path.send(mth).to_a).to eq expected_paths
+            expect(path.send(described_method).to_a).to eq expected_paths
           end
 
           it 'should enum path objects' do
-            path.send(mth).to_a.each{|path| expect(path).to be_a Path }
+            path.send(described_method).to_a.each{|path| expect(path).to be_a Path }
           end
         end
       end

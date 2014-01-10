@@ -4,7 +4,7 @@ module DescribeMethod
       name = (mth == args.first ? "##{mth}" : "##{mth} (alias of #{args.first})")
 
       describe(name) do
-        let(:mth) { mth }
+        let(:described_method) { mth }
         module_eval &block
       end
     end

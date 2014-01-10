@@ -37,7 +37,7 @@ describe Path do
             subject { dir.mkdir }
 
             it 'should raise some error' do
-              expect{ subject }.to raise_error(Errno::ENOENT, /No such file or directory - (.+)\/non-ext\/dir/)
+              expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /non-ext/dir")
             end
           end
         end
@@ -64,7 +64,7 @@ describe Path do
         let(:dir) { Path '/path/to/dir' }
         before { expect(dir).to_not be_existent }
         before { expect(dir.dir).to_not be_existent }
-        subject { dir.send(mth) }
+        subject { dir.send(described_method) }
 
         it 'should create directories' do
           expect(subject).to be_directory

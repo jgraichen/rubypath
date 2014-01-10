@@ -7,7 +7,7 @@ describe Path do
     let(:dotfile_ext) { Path('/path/to/.dotfile.en.sh') }
 
     describe_aliases :extensions, :exts do
-      subject { path.send mth }
+      subject { path.send described_method }
 
       it 'should return all file extensions' do
         should eq %w(de html slim)
@@ -79,7 +79,7 @@ describe Path do
     end
 
     describe_aliases :extension, :ext do
-      subject { path.send mth }
+      subject { path.send described_method }
 
       it 'should return last file extensions' do
         should eq 'slim'
@@ -91,7 +91,7 @@ describe Path do
 
       shared_examples 'extensions replacement' do
         context 'with array' do
-          subject { path.send mth, %w(en txt) }
+          subject { path.send described_method, %w(en txt) }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.en.txt"
@@ -101,7 +101,7 @@ describe Path do
         end
 
         context 'with multiple arguments' do
-          subject { path.send mth, *%w(en txt) }
+          subject { path.send described_method, *%w(en txt) }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.en.txt"
@@ -116,7 +116,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send mth, {'txt' => 'html'} }
+          subject { path.send described_method, {'txt' => 'html'} }
 
           it 'should replace all file extensions' do
             should eq "#{base}file"
@@ -131,7 +131,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send mth, {'txt' => 'html'} }
+          subject { path.send described_method, {'txt' => 'html'} }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.html"
@@ -146,7 +146,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send mth, {'en' => 'de'} }
+          subject { path.send described_method, {'en' => 'de'} }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.de.html.slim"
@@ -190,7 +190,7 @@ describe Path do
 
       shared_examples 'extension replacement' do
         context 'with array' do
-          subject { path.send mth, %w(mobile txt) }
+          subject { path.send described_method, %w(mobile txt) }
 
           it 'should replace last file extensions' do
             should eq "#{base}#{file}.mobile.txt"
@@ -200,7 +200,7 @@ describe Path do
         end
 
         context 'with multiple arguments' do
-          subject { path.send mth, *%w(mobile txt) }
+          subject { path.send described_method, *%w(mobile txt) }
 
           it 'should replace last file extensions' do
             should eq "#{base}#{file}.mobile.txt"
@@ -210,7 +210,7 @@ describe Path do
         end
 
         context 'with single string' do
-          subject { path.send mth, 'haml' }
+          subject { path.send described_method, 'haml' }
 
           it 'should replace last file extensions' do
             should eq "#{base}#{file}.haml"
