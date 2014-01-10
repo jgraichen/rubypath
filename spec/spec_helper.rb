@@ -36,4 +36,12 @@ RSpec.configure do |config|
   config.around(:each) do |example|
     Path::Backend.mock root: :tmp, &example
   end
+
+  config.before do
+    Timecop.freeze
+  end
+
+  config.after do
+    Timecop.return
+  end
 end

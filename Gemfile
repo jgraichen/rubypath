@@ -6,6 +6,7 @@ group :test do
   gem 'rspec', '>= 3.0.0.beta1'
   gem 'rspec-its'
   gem 'coveralls'
+  gem 'timecop'
 end
 
 group :development do
