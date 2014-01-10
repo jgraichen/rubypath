@@ -14,6 +14,7 @@ class Path
   require 'rubypath/file_operations'
   require 'rubypath/file_predicates'
   require 'rubypath/dir_operations'
+  require 'rubypath/io_operations'
 
   require 'rubypath/mock'
   require 'rubypath/backend'

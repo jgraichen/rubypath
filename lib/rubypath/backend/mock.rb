@@ -60,10 +60,15 @@ class Path::Backend
     end
 
     def mkdir(path)
-      path = expand_path(path)
-      node = self.lookup(::File.dirname(path))
-      raise Errno::ENOENT.new "No such file or directory - #{path}" unless node
-      node.children << Dir.new(self, ::File.basename(path))
+      node = lookup_parent! path
+      dir  = node.lookup ::File.basename path
+      unless Dir === dir
+        if dir.nil?
+          node.add Dir.new(self, ::File.basename(path))
+        else
+          raise ArgumentError.new "Node #{dir.path} exists and is no directory."
+        end
+      end
     end
 
     def mkpath(path)
@@ -74,16 +79,44 @@ class Path::Backend
     end
 
     def touch(path)
-      node = self.lookup(::File.dirname(path))
-      raise Errno::ENOENT.new "No such file or directory - #{path}" unless node
-      node.children << File.new(self, ::File.basename(path))
+      node = lookup_parent! path
+      file = node.lookup ::File.basename path
+      if file
+        file.mtime = Time.now
+      else
+        node.add File.new(self, ::File.basename(path))
+      end
+    end
+
+    def write(path, content)
+      node = lookup_parent! path
+      file = node.lookup ::File.basename(path)
+      unless file
+        file = File.new self, ::File.basename(path)
+        node.add file
+      end
+
+      file.content = content
+      file.mtime   = DateTime.now
+    end
+
+    def mtime(path)
+      lookup!(path).mtime
+    end
+
+    def mtime=(path, time)
+      lookup!(path).mtime = time
+    end
+
+    def read(path)
+      lookup_file!(path).content
     end
 
     #@!group Internal Virtual File System
 
     # Return root node.
     def root
-      @root ||= Dir.new(self, '/')
+      @root ||= Dir.new(self, '')
     end
 
     def lookup(path)
@@ -93,15 +126,61 @@ class Path::Backend
       self.root.lookup path
     end
 
+    def lookup!(path)
+      if (node = lookup(path))
+        node
+      else
+        raise Errno::ENOENT.new path
+      end
+    end
+
+    def lookup_file!(path)
+      node = lookup! path
+      case node
+      when File
+        node
+      when Dir
+        raise Errno::EISDIR.new path
+      else
+        raise ArgumentError.new "NOT A FILE: #{path}"
+      end
+    end
+
+    def lookup_dir!(path)
+      if Dir === (node = lookup!(path))
+        node
+      else
+        raise Errno::ENOENT.new path
+      end
+    end
+
+    def lookup_parent!(path)
+      if (node = lookup ::File.dirname expand_path path)
+        return node if Dir === node
+      end
+      raise Errno::ENOENT.new path
+    end
+
     class Node
-      attr_reader :sys, :name
+      attr_reader :sys, :name, :parent
+      attr_accessor :mtime
+
       def initialize(backend, name)
-        @sys  = backend
-        @name = name
+        @sys   = backend
+        @name  = name
+        @mtime = Time.now
       end
 
       def lookup(path)
         raise NotImplementError.new 'Subclass responsibility.'
+      end
+
+      def added(parent)
+        @parent = parent
+      end
+
+      def path
+        parent ? "#{parent.path}/#{name}" : name
       end
     end
 
@@ -124,12 +203,24 @@ class Path::Backend
         end
       end
 
+      def add(node)
+        raise ArgumentError.new "Node #{path}/#{node.name} already exists." if children.any?{|c| c.name == node.name}
+        children << node
+        node.added self
+      end
+
       def children
         @children ||= []
       end
     end
 
     class File < Node
+      attr_accessor :content
+
+      def initialize(*args)
+        super
+      end
+
       def lookup(path)
         nil
       end

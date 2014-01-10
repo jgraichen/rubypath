@@ -51,8 +51,13 @@ class Path
     delegate :directory?
     delegate :file?
     delegate :touch
+    delegate :write
+    delegate :read
+    delegate :mtime
+    delegate :mtime=
   end
 
+  private
   def invoke_backend(mth, *args)
     args << internal_path if args.empty?
     Backend.instance.send mth, *args

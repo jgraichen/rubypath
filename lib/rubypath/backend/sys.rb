@@ -25,9 +25,13 @@ class Path::Backend
       ::File.expand_path("#{@root}/#{::File.expand_path(path)}")
     end
 
-    def access_fs(obj, method, *args)
-      #puts "[ACCESS FS] #{obj} #{method} #{args.inspect}"
+    def fs(path, obj, method, *args)
+      # puts "[FS] #{obj} #{method} #{args.inspect}"
       obj.send method, *args
+    rescue Errno::ENOENT => ex
+      raise Errno::ENOENT.new path
+    rescue Errno::EISDIR => ex
+      raise Errno::EISDIR.new path
     end
 
     ## OPERATIONS
@@ -37,27 +41,47 @@ class Path::Backend
     end
 
     def exists?(path)
-      access_fs ::File, :exists?, r(path)
+      fs path, ::File, :exists?, r(path)
     end
 
     def mkdir(path)
-      access_fs ::Dir, :mkdir, r(path)
+      fs path, ::Dir, :mkdir, r(path)
     end
 
     def mkpath(path)
-      access_fs ::FileUtils, :mkdir_p, r(path)
+      fs path, ::FileUtils, :mkdir_p, r(path)
     end
 
     def directory?(path)
-      access_fs ::File, :directory?, r(path)
+      fs path, ::File, :directory?, r(path)
     end
 
     def file?(path)
-      access_fs ::File, :file?, r(path)
+      fs path, ::File, :file?, r(path)
     end
 
     def touch(path)
-      access_fs ::FileUtils, :touch, r(path)
+      fs path, ::FileUtils, :touch, r(path)
+    end
+
+    def write(path, content)
+      fs path, ::IO, :write, r(path), content
+    end
+
+    def read(path)
+      fs path, ::IO, :read, r(path)
+    end
+
+    def mtime(path)
+      fs path, ::File, :mtime, r(path)
+    end
+
+    def mtime=(path, time)
+      fs path, ::File, :utime, atime(path), time, r(path)
+    end
+
+    def atime(path)
+      fs path, ::File, :atime, r(path)
     end
   end
 end
