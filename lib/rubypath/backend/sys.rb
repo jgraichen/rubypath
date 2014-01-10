@@ -64,12 +64,12 @@ class Path::Backend
       fs path, ::FileUtils, :touch, r(path)
     end
 
-    def write(path, content)
-      fs path, ::IO, :write, r(path), content
+    def write(path, content, *args)
+      fs path, ::IO, :write, r(path), content, *args
     end
 
-    def read(path)
-      fs path, ::IO, :read, r(path)
+    def read(path, *args)
+      fs path, ::IO, :read, r(path), *args
     end
 
     def mtime(path)

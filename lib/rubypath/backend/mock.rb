@@ -88,7 +88,7 @@ class Path::Backend
       end
     end
 
-    def write(path, content)
+    def write(path, content, *args)
       node = lookup_parent! path
       file = node.lookup ::File.basename(path)
       unless file
@@ -96,8 +96,20 @@ class Path::Backend
         node.add file
       end
 
-      file.content = content
-      file.mtime   = DateTime.now
+      case file
+      when File
+        if args.empty?
+          file.content = content
+        else
+          offset = args[0].to_i
+          file.content[offset, content.length] = content
+        end
+        file.mtime   = DateTime.now
+      when Dir
+        raise Errno::EISDIR.new path
+      else
+        raise ArgumentError.new
+      end
     end
 
     def mtime(path)
@@ -108,8 +120,14 @@ class Path::Backend
       lookup!(path).mtime = time
     end
 
-    def read(path)
-      lookup_file!(path).content
+    def read(path, *args)
+      content = lookup_file!(path).content
+      if args[0]
+        length = args[0].to_i
+        offset = args[1] ? args[1].to_i : 0
+        content = content.slice(offset, length)
+      end
+      content
     end
 
     #@!group Internal Virtual File System

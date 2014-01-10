@@ -42,6 +42,25 @@ describe Path do
           it { should eq false }
         end
       end
+
+      describe_method :exists?, aliases: [:exist?, :existent?] do
+        let(:path) { Path '/file' }
+        subject { path.send described_method }
+
+        context 'with existing directory' do
+          before { path.mkdir }
+          it { should eq true }
+        end
+
+        context 'with existing file' do
+          before { path.touch }
+          it { should eq true }
+        end
+
+        context 'with non-existing node' do
+          it { should eq false }
+        end
+      end
     end
   end
 end
