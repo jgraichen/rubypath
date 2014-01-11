@@ -59,15 +59,29 @@ class Path
   # Given search pattern can either be a regular expression or a shell glob
   # expression.
   #
+  # @example
+  #   Path.cwd.lookup('project.{yml,yaml}')
+  #   #=> <Path:"/path/config.yml">
+  #
+  # @example
+  #   Path.cwd.lookup(/config(_\d+).ya?ml/)
+  #   #=> <Path:"/path/config_354.yaml">
+  #
+  # @example
+  #   Path('~').lookup('*config', ::File::FNM_DOTMATCH)
+  #   #=> <Path:"/gome/user/.gitconfig">
+  #
   # @param pattern [String|RegExp] Expression file name must match.
+  # @param flags [Integer] Additional flags. See {::File.fnmatch}.
+  #   Defaults to `File::FNM_EXTGLOB`.
   # @return [Path] Path to found file or nil.
   #
-  def lookup(pattern)
-    ascend do |path|
+  def lookup(pattern, flags = ::File::FNM_EXTGLOB)
+    expand.ascend do |path|
       case pattern
       when String
         path.entries.each do |c|
-          return path.join(c) if ::File.fnmatch?(pattern, c.name)
+          return path.join(c) if ::File.fnmatch?(pattern, c.name, flags)
         end
       when Regexp
         path.entries.each do |c|
