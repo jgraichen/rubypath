@@ -10,7 +10,7 @@ class Path
       new Backend.instance.getwd
     end
 
-    def glob(pattern, flags = 0)
+    def glob(pattern, flags = ::File::FNM_EXTGLOB)
       if block_given?
         Backend.instance.glob(pattern, flags) {|path| yield Path path }
       else
@@ -64,7 +64,7 @@ class Path
   end
 
   #
-  def glob(pattern, flags = 0)
+  def glob(pattern, flags = ::File::FNM_EXTGLOB)
     Path.glob ::File.join(escaped_glob_path, pattern), flags
   end
 
