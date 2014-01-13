@@ -40,18 +40,6 @@ class Path
     ::File.extname name
   end
 
-  # Check if file is a dot file.
-  #
-  # @example
-  #   Path("~/.gitconfig").dotfile?
-  #   #=> true
-  #
-  # @return [Boolean] True if file is a dot file otherwise false.
-  #
-  def dotfile?
-    name[0] == '.'
-  end
-
   # Return the file name without any extensions.
   #
   # @example

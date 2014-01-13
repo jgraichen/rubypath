@@ -47,5 +47,29 @@ describe Path do
         end
       end
     end
+
+    describe_method :dotfile? do
+      subject { path.dotfile? }
+
+      context 'with dotfile' do
+        let(:path) { Path '.abc' }
+        it { should be true }
+      end
+
+      context 'with path to dotfile' do
+        let(:path) { Path '/apth/to/.abc' }
+        it { should be true }
+      end
+
+      context 'with normal file' do
+        let(:path) { Path '/path/to/file' }
+        it { should be false }
+      end
+
+      context 'with path to file within a dotdir' do
+        let(:path) { Path '/home/user/.local/file' }
+        it { should be false }
+      end
+    end
   end
 end

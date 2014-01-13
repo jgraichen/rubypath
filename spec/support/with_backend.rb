@@ -12,6 +12,7 @@ module WithBackend
       end
 
       describe "with #{backend.upcase} FS" do
+        let(:backend_type) { backend }
         around do |example|
           be.call(example)
         end
@@ -19,6 +20,10 @@ module WithBackend
         module_eval &block
       end
     end
+  end
+
+  def pending_backend(*args)
+    before { pending "Pending on #{backend_type} backend." if args.include? backend_type }
   end
 
   RSpec.configure{|c| c.extend WithBackend }

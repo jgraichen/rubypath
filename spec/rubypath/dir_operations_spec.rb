@@ -3,14 +3,41 @@ require 'spec_helper'
 describe Path do
   describe 'Directory Operations' do
     with_backends :mock, :sys do
-      describe '#glob' do
-        before do
-          Path.mock do |root|
-            root.touch '/file.txt'
-            root.touch '/lib/path.rb'
-            root.touch '/lib/path/dir.rb'
-            root.touch '/lib/path/file.rb'
+      describe 'class' do
+        describe_method :glob do
+          before do
+            Path.mock do |root|
+              root.mkfile '/file.txt'
+              root.mkfile '/lib/path.rb'
+              root.mkfile '/lib/path/dir.rb'
+              root.mkfile '/lib/path/file.rb'
+              root.mkfile '/lib/path/ext.rb'
+            end
           end
+          subject { lambda{|*args| Path.glob *args } }
+
+          it 'should return matching files (I)' do
+            expect(subject.call('/*')).to match_array %w(/file.txt /lib)
+          end
+
+          it 'should return matching files (II)' do
+            expect(subject.call('/**/*.rb')).to match_array %w(/lib/path.rb /lib/path/dir.rb /lib/path/file.rb /lib/path/ext.rb)
+          end
+
+          it 'should return matching files (III)' do
+            expect(subject.call('/**/{dir,ext}.rb')).to match_array %w(/lib/path/dir.rb /lib/path/ext.rb)
+          end
+
+          it 'should return matching files (IV)' do
+            expect(subject.call('/lib/*.rb')).to match_array %w(/lib/path.rb)
+          end
+        end
+      end
+
+      describe '#glob' do
+        it 'should delegate to class#glob' do
+          expect(Path).to receive(:glob).with('/abc\[\]/.\*\{\}/file/**/{a,b}.rb', 10).and_return([])
+          Path('/abc[]/.*{}/file').glob('**/{a,b}.rb', 10)
         end
       end
 
@@ -33,7 +60,7 @@ describe Path do
           context 'in non-existent parent directory' do
             let(:dir) { Path '/non-ext/dir' }
             before { expect(dir).to_not be_existent }
-            before { expect(dir.dir).to_not be_existent }
+            before { expect(dir.parent).to_not be_existent }
             subject { dir.mkdir }
 
             it 'should raise some error' do
@@ -63,7 +90,7 @@ describe Path do
       describe_method :mkpath, aliases: [:mkdir_p] do
         let(:dir) { Path '/path/to/dir' }
         before { expect(dir).to_not be_existent }
-        before { expect(dir.dir).to_not be_existent }
+        before { expect(dir.parent).to_not be_existent }
         subject { dir.send(described_method) }
 
         it 'should create directories' do

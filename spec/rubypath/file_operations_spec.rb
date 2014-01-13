@@ -58,7 +58,7 @@ describe Path do
 
         context 'with existing file in path' do
           let(:path) { super().join('file') }
-          before { path.dir.write 'ABC' }
+          before { path.parent.write 'ABC' }
 
           it 'should raise ENOTDIR error' do
             expect { subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /rubypath/file")
@@ -96,7 +96,7 @@ describe Path do
 
         shared_examples '#mkfile' do
           it 'should create all missing directories' do
-            expect{ subject }.to change{ expected_path.dir.directory? }.from(false).to(true)
+            expect{ subject }.to change{ expected_path.parent.directory? }.from(false).to(true)
           end
 
           it 'should create file' do
@@ -122,7 +122,7 @@ describe Path do
         end
 
         context 'with existing file in path' do
-          before { path.dir.dir.mkpath; path.dir.touch }
+          before { path.parent.parent.mkpath; path.parent.touch }
 
           it 'should raise EISDIR error' do
             expect{ subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /path/to/file.txt")

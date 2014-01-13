@@ -3,7 +3,7 @@ class Path::Backend
   class Sys
 
     def initialize(root = nil)
-      @root = root
+      @root = ::File.expand_path root if root
     end
 
     def home(user)
@@ -23,6 +23,16 @@ class Path::Backend
     def r(path)
       return path unless @root
       ::File.expand_path("#{@root}/#{::File.expand_path(path)}")
+    end
+
+    def ur(path)
+      return path unless @root
+
+      if path.slice(0, @root.length) == @root
+        path.slice(@root.length, path.length - @root.length)
+      else
+        path
+      end
     end
 
     def fs(path, obj, method, *args)
@@ -88,6 +98,16 @@ class Path::Backend
 
     def entries(path)
       fs path, ::Dir, :entries, r(path)
+    end
+
+    def glob(pattern, flags = 0, &block)
+      if block_given?
+        fs pattern, ::Dir, :glob, r(pattern), flags do |path|
+          yield ur(path)
+        end
+      else
+        fs(pattern, ::Dir, :glob, r(pattern), flags).map{|path| ur path }
+      end
     end
   end
 end

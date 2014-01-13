@@ -29,5 +29,4 @@ class Path
   def directory?
     invoke_backend :directory?
   end
-  alias_method :dir?, :directory?
 end

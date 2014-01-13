@@ -42,6 +42,7 @@ class Path::Backend
         ::File.expand_path(path, base)
       end
     end
+    alias_method :expand, :expand_path
 
     def getwd
       @cwd ||= '/'
@@ -60,6 +61,8 @@ class Path::Backend
     end
 
     def mkdir(path)
+      return if path.to_s == '/'
+
       node = lookup_parent! path
       dir  = node.lookup ::File.basename path
       unless Dir === dir
@@ -135,6 +138,12 @@ class Path::Backend
       node.children.map(&:name) + %w(. ..)
     end
 
+    def glob(pattern, flags = 0, &block)
+      self.root.all.select do |node|
+        ::File.fnmatch pattern, node.path, (flags | ::File::FNM_PATHNAME)
+      end
+    end
+
     #@!group Internal Virtual File System
 
     # Return root node.
@@ -142,11 +151,13 @@ class Path::Backend
       @root ||= Dir.new(self, '')
     end
 
-    def lookup(path)
-      path = expand_path(path)
-      path = path[1..-1] if path[0] == '/'
+    def to_lookup(path)
+      path = expand path
+      path.sub /^\/+/, ''
+    end
 
-      self.root.lookup path
+    def lookup(path)
+      self.root.lookup to_lookup path
     end
 
     def lookup!(path)
@@ -178,7 +189,7 @@ class Path::Backend
     end
 
     def lookup_parent!(path)
-      if (node = lookup ::File.dirname expand_path path)
+      if (node = lookup ::File.dirname expand path)
         if Dir === node
           return node
         else
@@ -213,7 +224,7 @@ class Path::Backend
 
     class Dir < Node
       def lookup(path)
-        name, rest = path.split('/', 2).map(&:to_s)
+        name, rest = path.to_s.split('/', 2).map(&:to_s)
 
         if name.nil?
           if rest.nil?
@@ -234,6 +245,14 @@ class Path::Backend
         raise ArgumentError.new "Node #{path}/#{node.name} already exists." if children.any?{|c| c.name == node.name}
         children << node
         node.added self
+      end
+
+      def all
+        children.inject([]) do |memo, child|
+          memo << child
+          memo += child.all if Dir === child
+          memo
+        end
       end
 
       def children

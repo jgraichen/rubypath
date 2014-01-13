@@ -36,21 +36,21 @@ describe Path do
       end
     end
 
-    describe_aliases :dir, :dirname, :parent do
+    describe_method :dirname, aliases: [:parent] do
       shared_examples 'dirname' do
         it 'should return parent directory' do
-          expect(Path(base, 'path/to/file').dir).to eq "#{base}path/to"
+          expect(Path(base, 'path/to/file').send(described_method)).to eq "#{base}path/to"
         end
 
         context 'when hitting root' do
           it 'should return root' do
-            expect(Path(base, 'path').dir).to eq base[0]
+            expect(Path(base, 'path').send(described_method)).to eq base[0]
           end
         end
 
         context 'when being root' do
           it 'should return nil' do
-            expect(Path(base[0]).dir).to eq nil
+            expect(Path(base[0]).send(described_method)).to eq nil
           end
         end
       end

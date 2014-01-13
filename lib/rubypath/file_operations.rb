@@ -45,7 +45,7 @@ class Path
   #
   def mkfile(*args)
     with_path(*args) do |path|
-      path.dir.mkpath if !path.exists? && path.dir && !path.dir.exists?
+      path.parent.mkpath if !path.exists? && path.parent && !path.parent.exists?
       if path.exists?
         raise Errno::ENOENT.new path.to_s unless path.file?
       else

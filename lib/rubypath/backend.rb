@@ -56,11 +56,12 @@ class Path
     delegate :mtime
     delegate :mtime=
     delegate :entries
+    delegate :glob
   end
 
   private
   def invoke_backend(mth, *args)
-    args << internal_path if args.empty?
+    args << self if args.empty?
     Backend.instance.send mth, *args
   end
 

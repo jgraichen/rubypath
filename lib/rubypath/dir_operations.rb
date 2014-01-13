@@ -9,8 +9,14 @@ class Path
     def getwd
       new Backend.instance.getwd
     end
-    alias :cwd :getwd
-    alias :pwd :getwd
+
+    def glob(pattern, flags = 0)
+      if block_given?
+        Backend.instance.glob(pattern, flags) {|path| yield Path path }
+      else
+        Backend.instance.glob(pattern, flags).map(&Path)
+      end
+    end
   end
 
   # Create directory.
@@ -55,5 +61,15 @@ class Path
   #
   def entries(*args)
     invoke_backend(:entries, internal_path).map(&Path)
+  end
+
+  #
+  def glob(pattern, flags = 0)
+    Path.glob ::File.join(escaped_glob_path, pattern), flags
+  end
+
+  private
+  def escaped_glob_path
+    internal_path.gsub(/[\[\]\*\?\{\}]/, '\\\\\0')
   end
 end

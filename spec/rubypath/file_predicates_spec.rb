@@ -23,7 +23,7 @@ describe Path do
         end
       end
 
-      describe_method :directory?, aliases: [:dir?] do
+      describe_method :directory? do
         let(:dir) { Path '/dir' }
         before { expect(dir).to_not be_existent }
         subject { dir.send(described_method) }

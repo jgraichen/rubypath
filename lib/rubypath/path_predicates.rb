@@ -42,8 +42,20 @@ class Path
   # @see Pathname#mountpoint?
   #
   def mountpoint?(*args)
-    with_path(*args) do |str|
-      Backend.instance.mountpoint? str
+    with_path(*args) do |path|
+      Backend.instance.mountpoint? path
     end
+  end
+
+  # Check if file or directory is a dot file.
+  #
+  # @example
+  #   Path("~/.gitconfig").dotfile?
+  #   #=> true
+  #
+  # @return [Boolean] True if file is a dot file otherwise false.
+  #
+  def dotfile?
+    name[0] == '.'
   end
 end

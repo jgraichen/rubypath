@@ -35,7 +35,7 @@ class Path
   # @return [Path] Self.
   #
   def write(content, *args)
-    invoke_backend :write, internal_path, content, *args
+    invoke_backend :write, self, content, *args
     self
   end
 
@@ -77,6 +77,6 @@ class Path
   # @return [String] Read content.
   #
   def read(*args)
-    invoke_backend :read, internal_path, *args
+    invoke_backend :read, self, *args
   end
 end

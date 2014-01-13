@@ -93,14 +93,13 @@ class Path
   # @return [Path] Parent path or nil if path already points to an absolute
   #   or relative root.
   #
-  def dir
+  def dirname
     return nil if %w(. /).include? internal_path
 
     dir = ::File.dirname internal_path
     dir.empty? ? nil : self.class.new(dir)
   end
-  alias_method :dirname, :dir
-  alias_method :parent, :dir
+  alias_method :parent, :dirname
 
   # Yield given block for path and each ancestor.
   #
@@ -130,7 +129,7 @@ class Path
     path = self
     begin
       yield path
-    end while (path = path.dir)
+    end while (path = path.parent)
     self
   end
   alias_method :ancestors, :ascend
