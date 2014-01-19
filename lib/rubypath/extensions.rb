@@ -16,7 +16,6 @@ class Path
       name.split('.')[1..-1]
     end
   end
-  alias_method :exts, :extensions
 
   # Return last file extension.
   #
@@ -29,7 +28,6 @@ class Path
   def extension
     extensions.last
   end
-  alias_method :ext, :extension
 
   # Return last file extension include dot character.
   #
@@ -132,7 +130,6 @@ class Path
       end
     end
   end
-  alias_method :replace_exts, :replace_extensions
 
   # Replace last extension with one or multiple new extensions.
   #
@@ -153,6 +150,5 @@ class Path
 
     replace_extensions exts
   end
-  alias_method :replace_ext, :replace_extension
 
 end

@@ -6,7 +6,7 @@ describe Path do
     let(:dotfile) { Path '/path/to/.dotfile' }
     let(:dotfile_ext) { Path '/path/to/.dotfile.en.sh' }
 
-    describe_method :extensions, aliases: [:exts] do
+    describe_method :extensions do
       subject { path.send described_method }
 
       it 'should return all file extensions' do
@@ -78,7 +78,7 @@ describe Path do
       end
     end
 
-    describe_method :extension, aliases: [:ext] do
+    describe_method :extension do
       subject { path.send described_method }
 
       it 'should return last file extensions' do
@@ -86,7 +86,7 @@ describe Path do
       end
     end
 
-    describe_method :replace_extensions, aliases: [:replace_exts] do
+    describe_method :replace_extensions do
       let(:path) { Path "#{base}file#{exts}" }
 
       shared_examples 'extensions replacement' do
@@ -185,7 +185,7 @@ describe Path do
       end
     end
 
-    describe_method :replace_extension, aliases: [:replace_ext] do
+    describe_method :replace_extension do
       let(:path) { Path "#{base}#{file}#{ext}" }
 
       shared_examples 'extension replacement' do
