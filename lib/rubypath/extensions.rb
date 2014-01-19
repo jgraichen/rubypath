@@ -16,6 +16,7 @@ class Path
       name.split('.')[1..-1]
     end
   end
+  alias_method :exts, :extensions
 
   # Return last file extension.
   #
@@ -28,6 +29,7 @@ class Path
   def extension
     extensions.last
   end
+  alias_method :ext, :extension
 
   # Return last file extension include dot character.
   #
