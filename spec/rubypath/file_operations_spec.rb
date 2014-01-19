@@ -222,6 +222,34 @@ describe Path do
         end
       end
 
+      describe_method :mtime do
+        let(:path) { Path '/file.txt' }
+        before { path.touch }
+        subject { path.send described_method }
+
+        it 'should return file modification time' do
+          should be_within(0.1).of(Time.now)
+        end
+
+        context 'with modification time changed' do
+          before { path.mtime = Time.new(2175, 12, 24, 18, 00, 30) }
+
+          it 'should return file modification time' do
+            should eq Time.new(2175, 12, 24, 18, 00, 30)
+          end
+        end
+      end
+
+      describe_method :mtime= do
+        let(:path) { Path '/file.txt' }
+        before { path.touch }
+        subject { path.send described_method, Time.new(2175, 12, 24, 18, 00, 30) }
+
+        it 'should change file modification time' do
+          expect{ subject }.to change{ path.mtime }.to Time.new(2175, 12, 24, 18, 00, 30)
+        end
+      end
+
     end
   end
 end

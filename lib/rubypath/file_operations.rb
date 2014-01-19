@@ -93,12 +93,18 @@ class Path
     nil
   end
 
-  # TODO
+  # Return file modification time.
+  #
+  # @return [Time] Time of last modification.
+  #
   def mtime
     invoke_backend :mtime
   end
 
-  # TODO
+  # Set last modification time.
+  #
+  # @param [Time] Time of last modification.
+  #
   def mtime=(time)
     invoke_backend :mtime=, internal_path, time
   end
