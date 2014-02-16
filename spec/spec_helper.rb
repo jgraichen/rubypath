@@ -13,7 +13,6 @@ Bundler.require :default, :test
 require 'rubypath'
 
 Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f}
-Dir[File.expand_path('spec/shared_examples/**/*.rb')].each {|f| require f}
 
 RSpec.configure do |config|
   # ## Mock Framework
