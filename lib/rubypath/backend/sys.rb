@@ -3,7 +3,12 @@ class Path::Backend
   class Sys
 
     def initialize(root = nil)
-      @root = ::File.expand_path root if root
+      @root  = ::File.expand_path root if root
+      @umask = File.umask
+    end
+
+    def quit
+      File.umask @umask
     end
 
     def home(user)
@@ -112,6 +117,14 @@ class Path::Backend
       else
         fs(pattern, ::Dir, :glob, r(pattern), flags).map{|path| ur path }
       end
+    end
+
+    def get_umask
+      File.umask
+    end
+
+    def set_umask(mask)
+      File.umask mask
     end
   end
 end

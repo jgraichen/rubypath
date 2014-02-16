@@ -27,6 +27,7 @@ class Path::Backend
       @user  = 'root'
       @homes = {'root' => '/root'}
       @cwd   = '/root'
+      @umask = 0022
     end
 
     def home(user)
@@ -152,6 +153,14 @@ class Path::Backend
       self.root.all.select do |node|
         ::File.fnmatch pattern, node.path, (flags | ::File::FNM_PATHNAME)
       end
+    end
+
+    def get_umask
+      @umask
+    end
+
+    def set_umask(mask)
+      @umask = Integer(mask)
     end
 
     #@!group Internal Virtual File System

@@ -21,6 +21,7 @@ module WithBackend
       end
     end
   end
+  alias_method :with_backend, :with_backends
 
   def pending_backend(*args)
     before { pending "Pending on #{backend_type} backend." if args.include? backend_type }

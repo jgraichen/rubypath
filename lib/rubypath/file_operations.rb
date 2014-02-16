@@ -124,4 +124,30 @@ class Path
   def atime=(time)
     invoke_backend :atime=, internal_path, time
   end
+
+  class << self
+
+    # Read or set process umask.
+    #
+    # @overload umask
+    #   Read process umask.
+    #
+    #   @return [Integer] Process umask.
+    #
+    # @overload umask(mask)
+    #   Set process umask.
+    #
+    #   @param mask [Integer] New process umask.
+    #
+    # @see File.umask
+    #
+    def umask(mask = nil)
+      if mask
+        invoke_backend :set_umask, mask
+      else
+        invoke_backend :get_umask
+      end
+    end
+    alias_method :umask=, :umask
+  end
 end

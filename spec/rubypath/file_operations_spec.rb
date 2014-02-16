@@ -290,6 +290,60 @@ describe Path do
         end
       end
 
+      #describe_method :chmod do
+      #  let(:path) { Path '/file.txt' }
+      #  before { path.touch }
+      #  subject { path.send described_method }
+      #
+      #  it { should eq 0644 }
+      #end
+    end
+
+    describe 'umask' do
+      shared_examples 'umask setter' do
+        with_backend :sys do
+          it 'should set umask' do
+            subject
+            expect(File.umask).to eq 0077
+          end
+        end
+
+        with_backend :mock do
+          it 'should set umask' do
+            expect{ subject }.to change{ Path.umask }.from(0022).to(0077)
+          end
+        end
+      end
+
+      describe_method :umask do
+        let(:args) { Array.new }
+        subject { Path.send described_method, *args }
+
+        context 'as getter' do
+          with_backend :sys do
+            it 'should return umask' do
+              should eq File.umask
+            end
+          end
+
+          with_backend :mock do
+            it 'should return umask' do
+              should eq 0022
+            end
+          end
+        end
+
+        context 'as setter' do
+          let(:args) { [0077] }
+          it_behaves_like 'umask setter'
+        end
+      end
+
+      describe_method :umask= do
+        let(:args) { [0077] }
+        subject { Path.send described_method, *args }
+        it_behaves_like 'umask setter'
+      end
     end
   end
 end

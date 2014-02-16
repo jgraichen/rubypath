@@ -40,6 +40,7 @@ class Path
     def use_backend(be)
       old_backend, self.backend = self.backend, be
       yield
+      self.backend.quit if self.backend.respond_to? :quit
       self.backend = old_backend
     end
 
@@ -59,12 +60,21 @@ class Path
     delegate :glob
     delegate :atime
     delegate :atime=
+    delegate :get_umask
+    delegate :set_umask
   end
 
   private
   def invoke_backend(mth, *args)
     args << self if args.empty?
-    Backend.instance.send mth, *args
+    self.class.send :invoke_backend, mth, *args
+  end
+
+  class << self
+    private
+    def invoke_backend(mth, *args)
+      Backend.instance.send mth, *args
+    end
   end
 
   require 'rubypath/backend/mock'
