@@ -125,6 +125,14 @@ class Path
     invoke_backend :atime=, internal_path, time
   end
 
+  def mode
+    invoke_backend :mode
+  end
+
+  def chmod(mode)
+    invoke_backend :chmod, internal_path, mode
+  end
+
   class << self
 
     # Read or set process umask.

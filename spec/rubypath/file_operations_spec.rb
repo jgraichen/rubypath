@@ -290,13 +290,20 @@ describe Path do
         end
       end
 
-      #describe_method :chmod do
-      #  let(:path) { Path '/file.txt' }
-      #  before { path.touch }
-      #  subject { path.send described_method }
-      #
-      #  it { should eq 0644 }
-      #end
+      describe_method :mode do
+        let(:path) { Path '/file' }
+        subject { path.send described_method }
+
+        context 'with file' do
+          before { path.touch }
+          it { should eq 0666 - Path.umask }
+        end
+
+        context 'with directory' do
+          before { path.mkpath }
+          it { should eq 0777 - Path.umask }
+        end
+      end
     end
 
     describe 'umask' do

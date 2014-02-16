@@ -126,5 +126,13 @@ class Path::Backend
     def set_umask(mask)
       File.umask mask
     end
+
+    def mode(path)
+      fs(path, ::File, :stat, r(path)).mode & 0777
+    end
+
+    def chmod(path, mode)
+      fs path, ::File, :chmod, mode, r(path)
+    end
   end
 end

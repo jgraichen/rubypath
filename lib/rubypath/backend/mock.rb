@@ -163,6 +163,10 @@ class Path::Backend
       @umask = Integer(mask)
     end
 
+    def mode(path)
+      lookup!(path).mode
+    end
+
     #@!group Internal Virtual File System
 
     # Return root node.
@@ -218,9 +222,9 @@ class Path::Backend
 
     class Node
       attr_reader :sys, :name, :parent
-      attr_accessor :mtime, :atime
+      attr_accessor :mtime, :atime, :mode
 
-      def initialize(backend, name)
+      def initialize(backend, name, ops = {})
         @sys   = backend
         @name  = name
         @mtime = Time.now
@@ -246,6 +250,11 @@ class Path::Backend
     end
 
     class Dir < Node
+      def initialize(backend, name, opts = {})
+        super
+        self.mode = 0777 - backend.get_umask
+      end
+
       def lookup(path)
         name, rest = path.to_s.split('/', 2).map(&:to_s)
 
@@ -256,7 +265,8 @@ class Path::Backend
             lookup rest
           end
         else
-          if (child = children.find{|c| c.name == name })
+          child = children.find{|c| c.name == name }
+          if child
             rest.nil? ? child : child.lookup(rest)
           else
             nil
@@ -286,8 +296,9 @@ class Path::Backend
     class File < Node
       attr_accessor :content
 
-      def initialize(*args)
+      def initialize(backend, name, opts = {})
         super
+        self.mode = 0666 - backend.get_umask
       end
 
       def lookup(path)

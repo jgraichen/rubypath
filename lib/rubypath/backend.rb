@@ -62,6 +62,8 @@ class Path
     delegate :atime=
     delegate :get_umask
     delegate :set_umask
+    delegate :mode
+    delegate :chmod
   end
 
   private
