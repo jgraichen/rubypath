@@ -57,6 +57,8 @@ class Path
     delegate :mtime=
     delegate :entries
     delegate :glob
+    delegate :atime
+    delegate :atime=
   end
 
   private

@@ -37,10 +37,6 @@ RSpec.configure do |config|
     Path::Backend.mock root: :tmp, &example
   end
 
-  config.before do
-    Timecop.freeze
-  end
-
   config.after do
     Timecop.return
   end

@@ -96,6 +96,10 @@ class Path::Backend
       fs path, ::File, :atime, r(path)
     end
 
+    def atime=(path, time)
+      fs path, ::File, :utime, time, mtime(path), r(path)
+    end
+
     def entries(path)
       fs path, ::Dir, :entries, r(path)
     end

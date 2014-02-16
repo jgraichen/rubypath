@@ -108,4 +108,20 @@ class Path
   def mtime=(time)
     invoke_backend :mtime=, internal_path, time
   end
+
+  # Return file access time.
+  #
+  # @return [Time] Time of last access.
+  #
+  def atime
+    invoke_backend :atime
+  end
+
+  # Set last access time.
+  #
+  # @param [Time] Time of last access.
+  #
+  def atime=(time)
+    invoke_backend :atime=, internal_path, time
+  end
 end

@@ -39,7 +39,7 @@ describe Path do
           end
           before { expect(expected_path.mtime).to be < (Time.now - 30) }
 
-          it_behaves_like "#touch"
+          it_behaves_like '#touch'
 
           it 'should not change content' do
             subject
@@ -61,7 +61,7 @@ describe Path do
           before { path.parent.write 'ABC' }
 
           it 'should raise ENOTDIR error' do
-            expect { subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /rubypath/file")
+            expect { subject }.to raise_error(Errno::ENOTDIR, 'Not a directory - /rubypath/file')
           end
         end
 
@@ -83,7 +83,7 @@ describe Path do
           let(:path) { Path '/dir/file' }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /dir/file")
+            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /dir/file')
           end
         end
       end
@@ -117,7 +117,7 @@ describe Path do
           before { path.mkpath }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /path/to/file.txt")
+            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /path/to/file.txt')
           end
         end
 
@@ -125,7 +125,7 @@ describe Path do
           before { path.parent.parent.mkpath; path.parent.touch }
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(Errno::ENOTDIR, "Not a directory - /path/to/file.txt")
+            expect{ subject }.to raise_error(Errno::ENOTDIR, 'Not a directory - /path/to/file.txt')
           end
         end
 
@@ -133,7 +133,7 @@ describe Path do
           let(:path) { Path '/' }
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, "No such file or directory - /")
+            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /')
           end
         end
       end
@@ -151,73 +151,73 @@ describe Path do
         end
         before { expect(path.join('a/b/c/d')).to be_directory }
 
-        context "with filename" do
-          it "should find file in current directory" do
-            expect(path.join('a').send(described_method, "test.txt")).to eq path.join('a/test.txt').expand
+        context 'with filename' do
+          it 'should find file in current directory' do
+            expect(path.join('a').send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in parent directory" do
-            expect(path.join(%w(a b)).send(described_method, "test.txt")).to eq path.join('a/test.txt').expand
+          it 'should find file in parent directory' do
+            expect(path.join(%w(a b)).send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, "test.txt")).to eq path.join('a/test.txt').expand
+          it 'should find file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find first file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, "config.yaml")).to eq path.join('a/b/c/config.yaml').expand
+          it 'should find first file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, 'config.yaml')).to eq path.join('a/b/c/config.yaml').expand
           end
         end
 
-        context "with glob" do
-          it "should find file in current directory" do
+        context 'with glob' do
+          it 'should find file in current directory' do
             expect(path.join('a').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in parent directory" do
-            expect(path.join("a/b").send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
+          it 'should find file in parent directory' do
+            expect(path.join('a/b').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
+          it 'should find file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
           end
 
-          it "should find first file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, 'config.*')).to eq path.join('a/b/c/config.yaml').expand
+          it 'should find first file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, 'config.*')).to eq path.join('a/b/c/config.yaml').expand
           end
 
-          it "should find first file that match (I)" do
-            expect(path.join("a/b").send(described_method, '*.yml')).to eq path.join('a/config.yml').expand
+          it 'should find first file that match (I)' do
+            expect(path.join('a/b').send(described_method, '*.yml')).to eq path.join('a/config.yml').expand
           end
 
-          it "should find first file that match (II)" do
-            expect(path.join("a/b").send(described_method, 'config.{yml,yaml}')).to eq path.join('a/config.yml').expand
+          it 'should find first file that match (II)' do
+            expect(path.join('a/b').send(described_method, 'config.{yml,yaml}')).to eq path.join('a/config.yml').expand
           end
 
-          it "should find first file that dotmatch" do
-            expect(path.join("a/b").send(described_method, '*.yml', ::File::FNM_DOTMATCH)).to eq path.join('a/b/.config.yml').expand
+          it 'should find first file that dotmatch' do
+            expect(path.join('a/b').send(described_method, '*.yml', ::File::FNM_DOTMATCH)).to eq path.join('a/b/.config.yml').expand
           end
         end
 
-        context "with regexp" do
-          it "should find file in current directory" do
+        context 'with regexp' do
+          it 'should find file in current directory' do
             expect(path.join('a').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in parent directory" do
-            expect(path.join("a/b").send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
+          it 'should find file in parent directory' do
+            expect(path.join('a/b').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
           end
 
-          it "should find file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
+          it 'should find file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
           end
 
-          it "should find first file in ancestor directory" do
-            expect(path.join("a/b/c/d").send(described_method, /^config\.yaml$/)).to eq path.join('a/b/c/config.yaml').expand
+          it 'should find first file in ancestor directory' do
+            expect(path.join('a/b/c/d').send(described_method, /^config\.yaml$/)).to eq path.join('a/b/c/config.yaml').expand
           end
 
-          it "should find first file that match" do
-            expect(path.join("a/b").send(described_method, /^config\.ya?ml$/)).to eq path.join('a/config.yml').expand
+          it 'should find first file that match' do
+            expect(path.join('a/b').send(described_method, /^config\.ya?ml$/)).to eq path.join('a/config.yml').expand
           end
         end
       end
@@ -247,6 +247,46 @@ describe Path do
 
         it 'should change file modification time' do
           expect{ subject }.to change{ path.mtime }.to Time.new(2175, 12, 24, 18, 00, 30)
+        end
+      end
+
+      describe_method :atime do
+        let(:path) { Path '/file.txt' }
+        subject { path.send described_method }
+
+        context 'new create file' do
+          before { path.touch }
+
+          it { should be_within(0.1).of(Time.now) }
+        end
+
+        context 'with existing file' do
+          before { path.touch }
+
+          context 'older file' do
+            before { path.touch }
+            before { sleep 0.3 }
+
+            it { should be_within(0.1).of(Time.now - 0.3) }
+          end
+
+          context 'and changed access time' do
+            before { path.atime = Time.new(2175, 12, 24, 18, 00, 30) }
+
+            it 'should return file access time' do
+              should eq Time.new(2175, 12, 24, 18, 00, 30)
+            end
+          end
+        end
+      end
+
+      describe_method :atime= do
+        let(:path) { Path '/file.txt' }
+        before { path.touch }
+        subject { path.send described_method, Time.new(2175, 12, 24, 18, 00, 30) }
+
+        it 'should change file access time' do
+          expect{ subject }.to change{ path.atime }.to Time.new(2175, 12, 24, 18, 00, 30)
         end
       end
 

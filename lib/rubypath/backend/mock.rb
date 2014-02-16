@@ -107,7 +107,7 @@ class Path::Backend
           offset = args[0].to_i
           file.content[offset, content.length] = content
         end
-        file.mtime   = DateTime.now
+        file.mtime   = Time.now
       when Dir
         raise Errno::EISDIR.new path
       else
@@ -123,11 +123,21 @@ class Path::Backend
       lookup!(path).mtime = time
     end
 
+    def atime(path)
+      lookup!(path).atime
+    end
+
+    def atime=(path, time)
+      lookup!(path).atime = time
+    end
+
     def read(path, *args)
-      content = lookup_file!(path).content
+      file       = lookup_file!(path)
+      file.atime = Time.now
+      content    = file.content
       if args[0]
-        length = args[0].to_i
-        offset = args[1] ? args[1].to_i : 0
+        length  = args[0].to_i
+        offset  = args[1] ? args[1].to_i : 0
         content = content.slice(offset, length)
       end
       content
@@ -189,24 +199,28 @@ class Path::Backend
     end
 
     def lookup_parent!(path)
-      if (node = lookup ::File.dirname expand path)
-        if Dir === node
-          return node
-        else
-          raise Errno::ENOTDIR.new path
-        end
+      node = lookup ::File.dirname expand path
+      if node
+        Dir === node ? node : raise(Errno::ENOTDIR.new path)
+      else
+        raise Errno::ENOENT.new path
       end
-      raise Errno::ENOENT.new path
     end
 
     class Node
       attr_reader :sys, :name, :parent
-      attr_accessor :mtime
+      attr_accessor :mtime, :atime
 
       def initialize(backend, name)
         @sys   = backend
         @name  = name
         @mtime = Time.now
+        @atime = Time.now
+      end
+
+      def mtime=(time)
+        raise "Not Time but `#{time.inspect}` of `#{time.class.name}` given." unless Time === time
+        @mtime = time
       end
 
       def lookup(path)
