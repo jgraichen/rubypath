@@ -62,6 +62,10 @@ class Path
   #   Path('path/to/file').filenames
   #   # => ["path", "to", "file"]
   #
+  # @example
+  #   Path('/path/to/file').filenames
+  #   # => ["path", "to", "file"]
+  #
   # @return [Array<String>] File names.
   #
   def filenames
