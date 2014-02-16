@@ -1,6 +1,6 @@
 # Ruby::Path
 
-*Ruby::Path* introduces a global `Path` class unifying most `File`, `Dir`, `FileUtils` and `IO` operations with a flexible and powerful Object-Interface and still adding new useful methods and functions like mocking a while file system for fast and reliable testing.
+*Ruby::Path* introduces a global `Path` class unifying most `File`, `Dir`, `FileUtils`, `Pathname` and `IO` operations with a flexible and powerful Object-Interface and still adding new useful methods and functions like mocking a while file system for fast and reliable testing.
 
 ## Installation
 
