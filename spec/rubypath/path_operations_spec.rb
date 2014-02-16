@@ -36,31 +36,40 @@ describe Path do
       end
     end
 
-    describe_method :each_filename do
+    describe_method :each_component do
       let(:block) { nil }
-      let(:str) { '/path/to/templates/index.html' }
-      subject { path.send described_method, &block }
+      let(:opts) { Hash.new }
+      let(:str) { '/path/to/templates/dir/' }
+      subject { path.send described_method, opts, &block }
 
       it { should be_a Enumerator }
 
-      it 'should return all filenames' do
-        expect(subject.to_a).to eq %w(path to templates index.html)
+      it 'should return all components' do
+        expect(subject.to_a).to eq %w(path to templates dir)
+      end
+
+      context 'with empty option' do
+        let(:opts) { {empty: true} }
+
+        it 'should also return empty path components' do
+          expect(subject.to_a).to eq ([''] + %w(path to templates dir) + [''])
+        end
       end
 
       context 'with block' do
         let(:block) { proc{|fn| fn} }
 
-        it 'should yield filenames' do
+        it 'should yield components' do
           expect {|b|
             path.send described_method, &b
-          }.to yield_successive_args(*%w(path to templates index.html))
+          }.to yield_successive_args(*%w(path to templates dir))
         end
 
         it { should eq path }
       end
     end
 
-    describe_method :filenames do
+    describe_method :components do
       let(:str) { '/path/to/templates/index.html' }
       subject { path.send described_method }
 

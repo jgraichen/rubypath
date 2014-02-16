@@ -9,67 +9,73 @@ class Path
   def join(*args)
     parts = args.flatten
     case parts.size
-    when 0
-      self
-    when 1
-      join = Path parts.shift
-      join.absolute? ? join : Path(::File.join(self.path, join.path))
-    else
-      join(parts.shift).join(*parts)
+      when 0
+        self
+      when 1
+        join = Path parts.shift
+        join.absolute? ? join : Path(::File.join(self.path, join.path))
+      else
+        join(parts.shift).join(*parts)
     end
   end
 
-  # Iterate over all file names.
+  # Iterate over all path components.
   #
-  # @overload each_filename
-  #   Return a enumerator to iterate over all file names.
+  # @overload each_component
+  #   Return a enumerator to iterate over all path components.
   #
-  #   @example Iterate over file names using a enumerator
-  #     enum = Path('/path/to/file.txt').each_filename
+  #   @example Iterate over path components using a enumerator
+  #     enum = Path('/path/to/file.txt').each_component
   #     enum.each{|fn| puts fn}
   #     # => "path"
   #     # => "to"
   #     # => "file.txt"
   #
-  #   @example Map each file name and create a new path
+  #   @example Map each path component and create a new path
   #     path = Path('/path/to/file.txt')
-  #     Path path.each_filename.map{|fn| fn.length}
+  #     Path path.each_component.map{|fn| fn.length}
   #     # => <Path:"/4/2/8">
   #
-  #   @return [Enumerator] Return a enumerator for all file names.
+  #   @return [Enumerator] Return a enumerator for all path components.
   #
-  # @overload each_filename(&block)
-  #   Yield given block for each file name.
+  # @overload each_component(&block)
+  #   Yield given block for each path components.
   #
   #   @example Print each file name
-  #     Path('/path/to/file.txt').each_filename{|fn| puts fn}
+  #     Path('/path/to/file.txt').each_component{|fn| puts fn}
   #     # => "path"
   #     # => "to"
   #     # => "file.txt"
   #
-  #   @param block [Proc] Block to invoke with each filename. If no block is given
+  #   @param block [Proc] Block to invoke with each path component. If no block is given
   #     an enumerator will returned.
   #   @return [self] Self.
   #
-  def each_filename(&block)
-    rv = Pathname(self.path).each_filename &block
+  def each_component(opts = {}, &block)
+    rv = if opts[:empty]
+           ary = self.path.split(Path.separator)        # split eats leading slashes
+           ary << '' if self.path[-1] == Path.separator # so add an empty string if path ends with slash
+           ary.each &block
+         else
+           Pathname(self.path).each_filename &block
+         end
     block ? self : rv
   end
 
-  # Return an array with all file names.
+  # Return an array with all path components.
   #
   # @example
-  #   Path('path/to/file').filenames
+  #   Path('path/to/file').components
   #   # => ["path", "to", "file"]
   #
   # @example
-  #   Path('/path/to/file').filenames
+  #   Path('/path/to/file').components
   #   # => ["path", "to", "file"]
   #
   # @return [Array<String>] File names.
   #
-  def filenames
-    each_filename.to_a
+  def components
+    each_component.to_a
   end
 
   # Converts a pathname to an absolute pathname. Given arguments will be
@@ -112,6 +118,7 @@ class Path
       end
     end
   end
+
   alias_method :expand_path, :expand
   alias_method :absolute, :expand
   alias_method :absolute_path, :expand
@@ -152,6 +159,7 @@ class Path
     dir = ::File.dirname internal_path
     dir.empty? ? nil : self.class.new(dir)
   end
+
   alias_method :parent, :dirname
 
   # Yield given block for path and each ancestor.
@@ -185,6 +193,7 @@ class Path
     end while (path = path.parent)
     self
   end
+
   alias_method :each_ancestors, :ascend
 
   # Return an array of all ancestors.
