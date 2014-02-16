@@ -19,6 +19,55 @@ class Path
     end
   end
 
+  # Iterate over all file names.
+  #
+  # @overload each_filename
+  #   Return a enumerator to iterate over all file names.
+  #
+  #   @example Iterate over file names using a enumerator
+  #     enum = Path('/path/to/file.txt').each_filename
+  #     enum.each{|fn| puts fn}
+  #     # => "path"
+  #     # => "to"
+  #     # => "file.txt"
+  #
+  #   @example Map each file name and create a new path
+  #     path = Path('/path/to/file.txt')
+  #     Path path.each_filename.map{|fn| fn.length}
+  #     # => <Path:"/4/2/8">
+  #
+  #   @return [Enumerator] Return a enumerator for all file names.
+  #
+  # @overload each_filename(&block)
+  #   Yield given block for each file name.
+  #
+  #   @example Print each file name
+  #     Path('/path/to/file.txt').each_filename{|fn| puts fn}
+  #     # => "path"
+  #     # => "to"
+  #     # => "file.txt"
+  #
+  #   @param block [Proc] Block to invoke with each filename. If no block is given
+  #     an enumerator will returned.
+  #   @return [self] Self.
+  #
+  def each_filename(&block)
+    rv = Pathname(self.path).each_filename &block
+    block ? self : rv
+  end
+
+  # Return an array with all file names.
+  #
+  # @example
+  #   Path('path/to/file').filenames
+  #   # => ["path", "to", "file"]
+  #
+  # @return [Array<String>] File names.
+  #
+  def filenames
+    each_filename.to_a
+  end
+
   # Converts a pathname to an absolute pathname. Given arguments will be
   # joined to current path before expanding path. Relative paths are referenced
   # from the current working directory of the process unless the `:base` option
@@ -132,7 +181,19 @@ class Path
     end while (path = path.parent)
     self
   end
-  alias_method :ancestors, :ascend
+  alias_method :each_ancestors, :ascend
+
+  # Return an array of all ancestors.
+  #
+  # @example
+  #   Path('/path/to/file').ancestors
+  #   # => [<Path:/path/to/file.txt>, <Path:/path/to>, <Path:/path>, <Path:/>]
+  #
+  # @return [Array<Path>] All ancestors.
+  #
+  def ancestors
+    each_ancestors.to_a
+  end
 
   # Return given path as a relative path by just striping leading slashes.
   #

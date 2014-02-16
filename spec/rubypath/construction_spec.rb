@@ -36,6 +36,12 @@ describe Path do
         it { expect(subject.path).to eq 'path/to/dir/file.txt' }
         it { should be_a Path }
       end
+
+      context 'with Numerals' do
+        let(:args) { ['path', 5, 'to', 4.5, 'file.txt'] }
+        it { expect(subject.path).to eq 'path/5/to/4.5/file.txt' }
+        it { should be_a Path }
+      end
     end
 
     describe 'class' do

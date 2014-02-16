@@ -7,8 +7,8 @@ describe Path do
     let(:path) { Path(*args) }
     subject { path }
 
-    describe '#join' do
-      subject { path.join *join_args}
+    describe_method :join do
+      subject { path.send described_method, *join_args}
 
       context 'with single string' do
         let(:join_args) { ['to/file.txt'] }
@@ -34,6 +34,38 @@ describe Path do
         let(:join_args) { ['rel/file', '/path/to/file.txt', 'sub'] }
         it { should eq '/path/to/file.txt/sub' }
       end
+    end
+
+    describe_method :each_filename do
+      let(:block) { nil }
+      let(:str) { '/path/to/templates/index.html' }
+      subject { path.send described_method, &block }
+
+      it { should be_a Enumerator }
+
+      it 'should return all filenames' do
+        expect(subject.to_a).to eq %w(path to templates index.html)
+      end
+
+      context 'with block' do
+        let(:block) { proc{|fn| fn} }
+
+        it 'should yield filenames' do
+          expect {|b|
+            path.send described_method, &b
+          }.to yield_successive_args(*%w(path to templates index.html))
+        end
+
+        it { should eq path }
+      end
+    end
+
+    describe_method :filenames do
+      let(:str) { '/path/to/templates/index.html' }
+      subject { path.send described_method }
+
+      it { should be_a Array }
+      it { should eq %w(path to templates index.html) }
     end
 
     describe_method :dirname, aliases: [:parent] do
@@ -228,36 +260,34 @@ describe Path do
       end
     end
 
-    describe_aliases :ascend, :ancestors do
+    describe_method :ascend, aliases: [:each_ancestors] do
       shared_examples 'ascend' do
         context 'with block' do
-          it 'should yield each part path' do
-            received_paths = []
-            path.send(described_method) do |path|
-              received_paths << path
-            end
+          let(:block) { proc{} }
+          subject { path.send described_method, &block }
 
-            expect(received_paths).to eq expected_paths
+          it { should eq path }
+
+          it 'should yield part paths' do
+            expect{|b| path.send described_method, &b }.to yield_successive_args *expected_paths
           end
 
           it 'should yield Path objects' do
-            path.send(described_method) do |part|
-              expect(part).to be_a Path
-            end
+            expect{|b| path.send described_method, &b }.to yield_successive_args *expected_paths.map{ Path }
           end
         end
 
         context 'w/o block' do
-          it 'should return enumerable' do
-            expect(path.send(described_method)).to be_a Enumerable
+          subject { path.send described_method }
+
+          it { should be_a Enumerator }
+
+          it 'should yield part paths' do
+            expect{|b| subject.each &b }.to yield_successive_args *expected_paths
           end
 
-          it 'should enum part paths' do
-            expect(path.send(described_method).to_a).to eq expected_paths
-          end
-
-          it 'should enum path objects' do
-            path.send(described_method).to_a.each{|path| expect(path).to be_a Path }
+          it 'should yield path objects' do
+            expect{|b| subject.each &b }.to yield_successive_args *expected_paths.map{ Path }
           end
         end
       end
@@ -310,6 +340,34 @@ describe Path do
       context 'with filename only' do
         let(:path) { 'file.txt' }
         it { should eq '/file.txt' }
+      end
+    end
+
+    describe_method :ancestors do
+      shared_examples 'ancestors' do
+        subject { path.send described_method }
+
+        it { should be_a Array }
+
+        it 'should contain part paths' do
+          expect{|b| subject.each &b }.to yield_successive_args *expected_paths
+        end
+
+        it 'should contain path objects' do
+          expect{|b| subject.each &b }.to yield_successive_args *expected_paths.map{ Path }
+        end
+      end
+
+      context 'with absolute path' do
+        let(:path) { Path '/path/to/file.txt' }
+        let(:expected_paths) { %w(/path/to/file.txt /path/to /path /)}
+        it_behaves_like 'ancestors'
+      end
+
+      context 'with relative path' do
+        let(:path) { Path 'path/to/file.txt' }
+        let(:expected_paths) { %w(path/to/file.txt path/to path .)}
+        it_behaves_like 'ancestors'
       end
     end
   end

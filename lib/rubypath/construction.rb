@@ -51,7 +51,7 @@ class Path
       when String
         return obj
       else
-        [:to_path, :path].each do |mth|
+        [:to_path, :path, :to_str, :to_s].each do |mth|
           if obj.respond_to?(mth) && String === obj.send(mth)
             return obj.send(mth)
           end
