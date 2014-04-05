@@ -1,6 +1,6 @@
 class Path
   class << self
-    #@!group Mocking / Virtual File System
+    # @!group Mocking / Virtual File System
 
     # Configure current path backend. Can be used to configure specified
     # test scenario. If no virtual or scoped path backend is set the default

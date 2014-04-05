@@ -1,7 +1,7 @@
 class Path
 
   class << self
-    #@!group Construction
+    # @!group Construction
 
     # Create new {Path}.
     #
@@ -14,7 +14,7 @@ class Path
     def new(*args)
       args.flatten!
       return Path::EMPTY if args.empty?
-      return args.first if args.size == 1 && self === args.first
+      return args.first if args.size == 1 && args.first.is_a?(self)
       super
     end
 
@@ -31,10 +31,10 @@ class Path
     # @return [Boolean] True if object is path like, false otherwise.
     #
     def like?(obj)
-      return true if self === obj
-      return true if String === obj
-      return true if obj.respond_to?(:to_path) && String === obj.to_path
-      return true if obj.respond_to?(:path) && String === obj.path
+      return true if obj.is_a?(self)
+      return true if obj.is_a?(String)
+      return true if obj.respond_to?(:to_path) && obj.to_path.is_a?(String)
+      return true if obj.respond_to?(:path) && obj.path.is_a?(String)
       false
     end
 
@@ -48,17 +48,18 @@ class Path
     #
     def like_path(obj)
       case obj
-      when String
-        return obj
-      else
-        [:to_path, :path, :to_str, :to_s].each do |mth|
-          if obj.respond_to?(mth) && String === obj.send(mth)
-            return obj.send(mth)
+        when String
+          return obj
+        else
+          [:to_path, :path, :to_str, :to_s].each do |mth|
+            if obj.respond_to?(mth) && obj.send(mth).is_a?(String)
+              return obj.send(mth)
+            end
           end
-        end
       end
 
-      raise ArgumentError.new "Argument #{obj.inspect} cannot be converted to path string."
+      raise ArgumentError.new \
+        "Argument #{obj.inspect} cannot be converted to path string."
     end
 
     # Return system file path separator.
@@ -76,11 +77,11 @@ class Path
     #   %w(path/to/fileA path/to/fileB).map(&Path)
     #
     def to_proc
-      lambda { |*args| Path.new *args }
+      proc {|*args| Path.new(*args) }
     end
   end
 
-  #@!group Construction
+  # @!group Construction
 
   # Initialize new {Path} object.
   #
@@ -92,12 +93,12 @@ class Path
   def initialize(*args)
     parts = args.flatten
     @path = if parts.size > 1
-      ::File.join *parts.map {|p| Path.like_path p }
-    elsif parts.size == 1
-      Path.like_path(parts.first).dup
-    else
-      ''
-    end
+              ::File.join(*parts.map{|p| Path.like_path p })
+            elsif parts.size == 1
+              Path.like_path(parts.first).dup
+            else
+              ''
+            end
   end
 
   # Empty path.

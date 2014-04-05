@@ -116,7 +116,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send described_method, {'txt' => 'html'} }
+          subject{ path.send(described_method, 'txt' => 'html') }
 
           it 'should replace all file extensions' do
             should eq "#{base}file"
@@ -131,7 +131,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send described_method, {'txt' => 'html'} }
+          subject { path.send(described_method, 'txt' => 'html') }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.html"
@@ -146,7 +146,7 @@ describe Path do
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject { path.send described_method, {'en' => 'de'} }
+          subject { path.send(described_method, 'en' => 'de') }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.de.html.slim"
@@ -221,19 +221,19 @@ describe Path do
       end
 
       shared_examples 'w/o ext' do
-        let(:file) { 'file'}
+        let(:file) { 'file' }
         let(:ext)  { '' }
         it_behaves_like 'extension replacement'
       end
 
       shared_examples 'with single ext' do
-        let(:file) { 'file'}
+        let(:file) { 'file' }
         let(:ext)  { '.txt' }
         it_behaves_like 'extension replacement'
       end
 
       shared_examples 'with multiple ext' do
-        let(:file) { 'file.de'}
+        let(:file) { 'file.de' }
         let(:ext)  { '.txt' }
         it_behaves_like 'extension replacement'
       end

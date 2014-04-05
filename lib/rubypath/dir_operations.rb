@@ -69,6 +69,7 @@ class Path
   end
 
   private
+
   def escaped_glob_path
     internal_path.gsub(/[\[\]\*\?\{\}]/, '\\\\\0')
   end

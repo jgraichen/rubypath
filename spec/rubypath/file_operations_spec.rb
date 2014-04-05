@@ -17,7 +17,7 @@ describe Path do
         let(:path) { Path '/rubypath' }
         let(:args) { Array.new }
         let(:expected_path) { path }
-        subject { path.touch *args }
+        subject { path.touch(*args) }
         before { expect(path).to_not be_existent }
 
         shared_examples '#touch' do
@@ -61,7 +61,8 @@ describe Path do
           before { path.parent.write 'ABC' }
 
           it 'should raise ENOTDIR error' do
-            expect { subject }.to raise_error(Errno::ENOTDIR, 'Not a directory - /rubypath/file')
+            expect{ subject }.to raise_error(
+              Errno::ENOTDIR, 'Not a directory - /rubypath/file')
           end
         end
 
@@ -83,7 +84,8 @@ describe Path do
           let(:path) { Path '/dir/file' }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /dir/file')
+            expect{ subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /dir/file')
           end
         end
       end
@@ -96,11 +98,13 @@ describe Path do
 
         shared_examples '#mkfile' do
           it 'should create all missing directories' do
-            expect{ subject }.to change{ expected_path.parent.directory? }.from(false).to(true)
+            expect{ subject }.to change{ expected_path.parent.directory? }
+              .from(false).to(true)
           end
 
           it 'should create file' do
-            expect{ subject }.to change{ expected_path.file? }.from(false).to(true)
+            expect{ subject }.to change{ expected_path.file? }
+              .from(false).to(true)
           end
         end
 
@@ -108,7 +112,7 @@ describe Path do
 
         context 'with args' do
           let(:args) { %w(sub file) }
-          let(:expected_path) { Path '/path/to/file.txt/sub/file'}
+          let(:expected_path) { Path '/path/to/file.txt/sub/file' }
 
           it_behaves_like '#mkfile'
         end
@@ -117,15 +121,20 @@ describe Path do
           before { path.mkpath }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /path/to/file.txt')
+            expect{ subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /path/to/file.txt')
           end
         end
 
         context 'with existing file in path' do
-          before { path.parent.parent.mkpath; path.parent.touch }
+          before do
+            path.parent.parent.mkpath
+            path.parent.touch
+          end
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(Errno::ENOTDIR, 'Not a directory - /path/to/file.txt')
+            expect{ subject }.to raise_error(
+              Errno::ENOTDIR, 'Not a directory - /path/to/file.txt')
           end
         end
 
@@ -133,7 +142,8 @@ describe Path do
           let(:path) { Path '/' }
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /')
+            expect{ subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /')
           end
         end
       end
@@ -153,71 +163,90 @@ describe Path do
 
         context 'with filename' do
           it 'should find file in current directory' do
-            expect(path.join('a').send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
+            expect(path.join('a').send(described_method, 'test.txt'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in parent directory' do
-            expect(path.join(%w(a b)).send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
+            expect(path.join(%w(a b)).send(described_method, 'test.txt'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, 'test.txt')).to eq path.join('a/test.txt').expand
+            expect(path.join('a/b/c/d').send(described_method, 'test.txt'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find first file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, 'config.yaml')).to eq path.join('a/b/c/config.yaml').expand
+            expect(path.join('a/b/c/d').send(described_method, 'config.yaml'))
+              .to eq path.join('a/b/c/config.yaml').expand
           end
         end
 
         context 'with glob' do
           it 'should find file in current directory' do
-            expect(path.join('a').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
+            expect(path.join('a').send(described_method, 'test.*'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in parent directory' do
-            expect(path.join('a/b').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
+            expect(path.join('a/b').send(described_method, 'test.*'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, 'test.*')).to eq path.join('a/test.txt').expand
+            expect(path.join('a/b/c/d').send(described_method, 'test.*'))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find first file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, 'config.*')).to eq path.join('a/b/c/config.yaml').expand
+            expect(path.join('a/b/c/d').send(described_method, 'config.*'))
+              .to eq path.join('a/b/c/config.yaml').expand
           end
 
           it 'should find first file that match (I)' do
-            expect(path.join('a/b').send(described_method, '*.yml')).to eq path.join('a/config.yml').expand
+            expect(path.join('a/b').send(described_method, '*.yml'))
+              .to eq path.join('a/config.yml').expand
           end
 
           it 'should find first file that match (II)' do
-            expect(path.join('a/b').send(described_method, 'config.{yml,yaml}')).to eq path.join('a/config.yml').expand
+            expect(path.join('a/b')
+              .send(described_method, 'config.{yml,yaml}'))
+              .to eq path.join('a/config.yml').expand
           end
 
           it 'should find first file that dotmatch' do
-            expect(path.join('a/b').send(described_method, '*.yml', ::File::FNM_DOTMATCH)).to eq path.join('a/b/.config.yml').expand
+            expect(path.join('a/b')
+              .send(described_method, '*.yml', ::File::FNM_DOTMATCH))
+              .to eq path.join('a/b/.config.yml').expand
           end
         end
 
         context 'with regexp' do
           it 'should find file in current directory' do
-            expect(path.join('a').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
+            expect(path.join('a').send(described_method, /^test\.txt$/))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in parent directory' do
-            expect(path.join('a/b').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
+            expect(path.join('a/b').send(described_method, /^test\.txt$/))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, /^test\.txt$/)).to eq path.join('a/test.txt').expand
+            expect(path.join('a/b/c/d').send(described_method, /^test\.txt$/))
+              .to eq path.join('a/test.txt').expand
           end
 
           it 'should find first file in ancestor directory' do
-            expect(path.join('a/b/c/d').send(described_method, /^config\.yaml$/)).to eq path.join('a/b/c/config.yaml').expand
+            expect(path.join('a/b/c/d')
+              .send(described_method, /^config\.yaml$/))
+              .to eq path.join('a/b/c/config.yaml').expand
           end
 
           it 'should find first file that match' do
-            expect(path.join('a/b').send(described_method, /^config\.ya?ml$/)).to eq path.join('a/config.yml').expand
+            expect(path.join('a/b').send(described_method, /^config\.ya?ml$/))
+              .to eq path.join('a/config.yml').expand
           end
         end
       end

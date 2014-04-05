@@ -7,31 +7,38 @@ describe Path do
     describe_method :eql?, aliases: [:==] do
       context 'with Path object' do
         it 'should compare paths (1)' do
-          expect(path.send(described_method, described_class.new('/path/to/file'))).to eq true
+          res = path.send described_method, Path('/path/to/file')
+          expect(res).to be true
         end
 
         it 'should compare paths (1)' do
-          expect(path.send(described_method, described_class.new('/path/to/another/file'))).to eq false
+          res = path.send described_method, Path('/path/to/another/file')
+          expect(res).to be false
         end
       end
 
       context 'with String object' do
         it 'should compare paths (1)' do
-          expect(path.send(described_method, '/path/to/file')).to eq true
+          res = path.send described_method, '/path/to/file'
+          expect(res).to be true
         end
 
         it 'should compare paths (1)' do
-          expect(path.send(described_method, '/path/to/another/file')).to eq false
+          res = path.send described_method, '/path/to/another/file'
+          expect(res).to be false
         end
       end
 
       context 'with Pathname object' do
         it 'should compare paths (1)' do
-          expect(path.send(described_method, Pathname.new('/path/to/file'))).to eq true
+          res = path.send described_method, Pathname.new('/path/to/file')
+          expect(res).to be true
         end
 
         it 'should compare paths (1)' do
-          expect(path.send(described_method, Pathname.new('/path/to/another/file'))).to eq false
+          res = path.send described_method,
+                          Pathname.new('/path/to/another/file')
+          expect(res).to be false
         end
       end
     end

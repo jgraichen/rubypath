@@ -1,5 +1,5 @@
 class Path
-  #@!group IO Operations
+  # @!group IO Operations
 
   # Write given content to file.
   #

@@ -2,7 +2,7 @@ class Path
   class Backend
     class << self
       def instance
-        @instance ||= self.new
+        @instance ||= new
       end
 
       def delegate(mth)
@@ -12,7 +12,7 @@ class Path
       end
 
       def mock(*args, &block)
-        self.instance.mock *args, &block
+        self.instance.mock(*args, &block)
       end
     end
 
@@ -38,9 +38,9 @@ class Path
     end
 
     def use_backend(be)
-      old_backend, self.backend = self.backend, be
+      old_backend, self.backend = backend, be
       yield
-      self.backend.quit if self.backend.respond_to? :quit
+      backend.quit if backend.respond_to? :quit
       self.backend = old_backend
     end
 
@@ -67,13 +67,16 @@ class Path
   end
 
   private
+
   def invoke_backend(mth, *args)
     args << self if args.empty?
     self.class.send :invoke_backend, mth, *args
   end
 
   class << self
+
     private
+
     def invoke_backend(mth, *args)
       Backend.instance.send mth, *args
     end

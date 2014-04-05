@@ -1,5 +1,6 @@
 class Path::Backend
 
+  #
   class Sys
 
     def initialize(root = nil)
@@ -43,11 +44,11 @@ class Path::Backend
     def fs(path, obj, method, *args)
       # puts "[FS] #{obj} #{method} #{args.inspect}"
       obj.send method, *args
-    rescue Errno::ENOENT => ex
+    rescue Errno::ENOENT
       raise Errno::ENOENT.new path
-    rescue Errno::EISDIR => ex
+    rescue Errno::EISDIR
       raise Errno::EISDIR.new path
-    rescue Errno::ENOTDIR => ex
+    rescue Errno::ENOTDIR
       raise Errno::ENOTDIR.new path
     end
 

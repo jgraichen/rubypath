@@ -1,4 +1,4 @@
-require "rubypath/version"
+require 'rubypath/version'
 
 #
 #

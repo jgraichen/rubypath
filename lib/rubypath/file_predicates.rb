@@ -1,5 +1,5 @@
 class Path
-  #@!group File Predicates
+  # @!group File Predicates
 
   # Check if path points to file.
   #

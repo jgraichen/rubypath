@@ -1,5 +1,5 @@
 class Path
-  #@!group File Operations
+  # @!group File Operations
 
   # Return base name without path.
   #
@@ -45,7 +45,10 @@ class Path
   #
   def mkfile(*args)
     with_path(*args) do |path|
-      path.parent.mkpath if !path.exists? && path.parent && !path.parent.exists?
+      if !path.exists? && path.parent && !path.parent.exists?
+        path.parent.mkpath
+      end
+
       if path.exists?
         raise Errno::ENOENT.new path.to_s unless path.file?
       else
@@ -79,14 +82,14 @@ class Path
   def lookup(pattern, flags = ::File::FNM_EXTGLOB)
     expand.ascend do |path|
       case pattern
-      when String
-        path.entries.each do |c|
-          return path.join(c) if ::File.fnmatch?(pattern, c.name, flags)
-        end
-      when Regexp
-        path.entries.each do |c|
-          return path.join(c) if pattern =~ c.name
-        end
+        when String
+          path.entries.each do |c|
+            return path.join(c) if ::File.fnmatch?(pattern, c.name, flags)
+          end
+        when Regexp
+          path.entries.each do |c|
+            return path.join(c) if pattern =~ c.name
+          end
       end
     end
 

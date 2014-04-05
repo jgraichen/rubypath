@@ -3,7 +3,7 @@ class Path::Backend
   class Mock
     attr_reader :user, :homes
 
-    #@!group Virtual File System Configuration
+    # @!group Virtual File System Configuration
 
     # Set user that owns the current process.
     def current_user=(user)
@@ -12,16 +12,12 @@ class Path::Backend
 
     # Define new home directories. Must be given as has a hash that is
     # interpreted as a user name to home directory mapping.
-    def homes=(homes)
-      @homes = homes
-    end
+    attr_writer :homes
 
     # Set current working directory.
-    def cwd=(cwd)
-      @cwd = cwd
-    end
+    attr_writer :cwd
 
-    #@!group Internal Methods
+    # @!group Internal Methods
 
     def initialize
       @user  = 'root'
@@ -31,14 +27,14 @@ class Path::Backend
     end
 
     def home(user)
-      self.homes[user] or raise ArgumentError.new("user #{user} doesn't exist")
+      homes.fetch(user){ raise ArgumentError.new "user #{user} doesn't exist" }
     end
 
-    #@!group Backend Operations
+    # @!group Backend Operations
 
     def expand_path(path, base = getwd)
-      if /^~(?<name>[^\/]*)(\/(?<rest>.*))?$/ =~ path
-        ::File.expand_path rest.to_s, self.home(name.empty? ? self.user : name)
+      if %r{^~(?<name>[^/]*)(/(?<rest>.*))?$} =~ path
+        ::File.expand_path rest.to_s, home(name.empty? ? user : name)
       else
         ::File.expand_path(path, base)
       end
@@ -50,15 +46,15 @@ class Path::Backend
     end
 
     def file?(path)
-      File === self.lookup(path)
+      lookup(path).is_a?(File)
     end
 
     def directory?(path)
-      Dir === self.lookup(path)
+      lookup(path).is_a?(Dir)
     end
 
     def exists?(path)
-      !!self.lookup(path)
+      lookup(path) ? true : false
     end
 
     def mkdir(path)
@@ -66,19 +62,20 @@ class Path::Backend
 
       node = lookup_parent! path
       dir  = node.lookup ::File.basename path
-      unless Dir === dir
+      unless dir.is_a?(Dir)
         if dir.nil?
           node.add Dir.new(self, ::File.basename(path))
         else
-          raise ArgumentError.new "Node #{dir.path} exists and is no directory."
+          raise ArgumentError.new \
+            "Node #{dir.path} exists and is no directory."
         end
       end
     end
 
     def mkpath(path)
       path = expand_path(path)
-      ::Pathname.new(path).descend do |path|
-        mkdir(path.to_s)
+      ::Pathname.new(path).descend do |p|
+        mkdir(p.to_s)
       end
     end
 
@@ -101,18 +98,18 @@ class Path::Backend
       end
 
       case file
-      when File
-        if args.empty?
-          file.content = content
+        when File
+          if args.empty?
+            file.content = content
+          else
+            offset = args[0].to_i
+            file.content[offset, content.length] = content
+          end
+          file.mtime   = Time.now
+        when Dir
+          raise Errno::EISDIR.new path
         else
-          offset = args[0].to_i
-          file.content[offset, content.length] = content
-        end
-        file.mtime   = Time.now
-      when Dir
-        raise Errno::EISDIR.new path
-      else
-        raise ArgumentError.new
+          raise ArgumentError.new
       end
     end
 
@@ -150,7 +147,7 @@ class Path::Backend
     end
 
     def glob(pattern, flags = 0, &block)
-      self.root.all.select do |node|
+      root.all.select do |node|
         ::File.fnmatch pattern, node.path, (flags | ::File::FNM_PATHNAME)
       end
     end
@@ -167,7 +164,7 @@ class Path::Backend
       lookup!(path).mode
     end
 
-    #@!group Internal Virtual File System
+    # @!group Internal Virtual File System
 
     # Return root node.
     def root
@@ -176,11 +173,11 @@ class Path::Backend
 
     def to_lookup(path)
       path = expand path
-      path.sub /^\/+/, ''
+      path.sub(/^\/+/, '')
     end
 
     def lookup(path)
-      self.root.lookup to_lookup path
+      root.lookup to_lookup path
     end
 
     def lookup!(path)
@@ -194,17 +191,17 @@ class Path::Backend
     def lookup_file!(path)
       node = lookup! path
       case node
-      when File
-        node
-      when Dir
-        raise Errno::EISDIR.new path
-      else
-        raise ArgumentError.new "NOT A FILE: #{path}"
+        when File
+          node
+        when Dir
+          raise Errno::EISDIR.new path
+        else
+          raise ArgumentError.new "NOT A FILE: #{path}"
       end
     end
 
     def lookup_dir!(path)
-      if Dir === (node = lookup!(path))
+      if (node = lookup!(path)).is_a?(Dir)
         node
       else
         raise Errno::ENOENT.new path
@@ -214,12 +211,13 @@ class Path::Backend
     def lookup_parent!(path)
       node = lookup ::File.dirname expand path
       if node
-        Dir === node ? node : raise(Errno::ENOTDIR.new path)
+        node.is_a?(Dir) ? node : raise(Errno::ENOTDIR.new path)
       else
         raise Errno::ENOENT.new path
       end
     end
 
+    #
     class Node
       attr_reader :sys, :name, :parent
       attr_accessor :mtime, :atime, :mode
@@ -232,8 +230,11 @@ class Path::Backend
       end
 
       def mtime=(time)
-        raise "Not Time but `#{time.inspect}` of `#{time.class.name}` given." unless Time === time
-        @mtime = time
+        if time.is_a?(Time)
+          @mtime = time
+        else
+          raise "Not Time but `#{time.inspect}` of `#{time.class.name}` given."
+        end
       end
 
       def lookup(path)
@@ -249,6 +250,7 @@ class Path::Backend
       end
     end
 
+    #
     class Dir < Node
       def initialize(backend, name, opts = {})
         super
@@ -275,15 +277,18 @@ class Path::Backend
       end
 
       def add(node)
-        raise ArgumentError.new "Node #{path}/#{node.name} already exists." if children.any?{|c| c.name == node.name}
-        children << node
-        node.added self
+        if children.any?{|c| c.name == node.name }
+          raise ArgumentError.new "Node #{path}/#{node.name} already exists."
+        else
+          children << node
+          node.added self
+        end
       end
 
       def all
-        children.inject([]) do |memo, child|
+        children.reduce([]) do |memo, child|
           memo << child
-          memo += child.all if Dir === child
+          memo += child.all if child.is_a?(Dir)
           memo
         end
       end
@@ -293,6 +298,7 @@ class Path::Backend
       end
     end
 
+    #
     class File < Node
       attr_accessor :content
 

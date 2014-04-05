@@ -1,9 +1,15 @@
 class Path
-  #@!group Path Operations
+  # @!group Path Operations
 
   # Join path with given arguments.
   #
   # @overload initialize([[Path, String, #to_path, #path, #to_s], ...]
+  #   Join all given arguments to build a new path.
+  #
+  #   @example
+  #     Path('/').join('test', %w(a b), 5, Pathname.new('file'))
+  #     # => <Path:"/test/a/b/5/file">
+  #
   # @return [Path]
   #
   def join(*args)
@@ -13,7 +19,7 @@ class Path
         self
       when 1
         join = Path parts.shift
-        join.absolute? ? join : Path(::File.join(self.path, join.path))
+        join.absolute? ? join : Path(::File.join(path, join.path))
       else
         join(parts.shift).join(*parts)
     end
@@ -47,17 +53,19 @@ class Path
   #     # => "to"
   #     # => "file.txt"
   #
-  #   @param block [Proc] Block to invoke with each path component. If no block is given
-  #     an enumerator will returned.
+  #   @param block [Proc] Block to invoke with each path component.
+  #     If no block is given an enumerator will returned.
   #   @return [self] Self.
   #
   def each_component(opts = {}, &block)
     rv = if opts[:empty]
-           ary = self.path.split(Path.separator)        # split eats leading slashes
-           ary << '' if self.path[-1] == Path.separator # so add an empty string if path ends with slash
-           ary.each &block
+           # split eats leading slashes
+           ary = path.split(Path.separator)
+           # so add an empty string if path ends with slash
+           ary << '' if path[-1] == Path.separator
+           ary.each(&block)
          else
-           Pathname(self.path).each_filename &block
+           Pathname(path).each_filename(&block)
          end
     block ? self : rv
   end
@@ -83,9 +91,9 @@ class Path
   # from the current working directory of the process unless the `:base` option
   # is set, which will be used as the starting point.
   #
-  # The given pathname may start with a “~”, which expands to the process
-  # owner’s home directory (the environment variable HOME must be set
-  # correctly). “~user” expands to the named user’s home directory.
+  # The given pathname may start with a "~", which expands to the process
+  # owner's home directory (the environment variable HOME must be set
+  # correctly). "~user" expands to the named user's home directory.
   #
   # @example
   #   Path('path/to/../tmp').expand
@@ -107,11 +115,12 @@ class Path
   # @see ::File#expand_path
   #
   def expand(*args)
-    opts = Hash === args.last ? args.pop : Hash.new
+    opts = args.last.is_a?(Hash) ? args.pop : {}
 
     with_path(*args) do |path|
-      base = Path.like_path(opts[:base] || Backend.instance.getwd)
-      if (expanded_path = Backend.instance.expand_path(path, base)) != internal_path
+      base          = Path.like_path(opts[:base] || Backend.instance.getwd)
+      expanded_path = Backend.instance.expand_path(path, base)
+      if expanded_path != internal_path
         Path expanded_path
       else
         self
@@ -188,9 +197,11 @@ class Path
     return to_enum(:ascend) unless block_given?
 
     path = self
-    begin
+    loop do
       yield path
-    end while (path = path.parent)
+      break unless (path = path.parent)
+    end
+
     self
   end
 

@@ -1,5 +1,5 @@
 class Path
-  #@!group Path Predicates
+  # @!group Path Predicates
 
   # Check if path is an absolute path.
   #

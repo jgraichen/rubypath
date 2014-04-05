@@ -1,5 +1,5 @@
 class Path
-  #@!group File Extensions
+  # @!group File Extensions
 
   # Return list of all file extensions.
   #
@@ -56,7 +56,7 @@ class Path
     if dotfile?
       name.split('.', 3)[0..1].join('.')
     else
-      name.split('.',2 )[0]
+      name.split('.', 2)[0]
     end
   end
 
@@ -108,27 +108,28 @@ class Path
   #
   def replace_extensions(*args)
     args.flatten!
-    exts = self.extensions
+    extensions = self.extensions
 
-    if (replace = (Hash === args.last ? args.pop : nil))
+    if (replace = (args.last.is_a?(Hash) ? args.pop : nil))
       if args.empty?
-        exts.map! do |ext|
+        extensions.map! do |ext|
           replace[ext] ? replace[ext].to_s : ext
         end
       else
-        raise ArgumentError.new 'Cannot replace extensions with array and hash at the same time.'
+        raise ArgumentError.new 'Cannot replace extensions with array ' \
+                                'and hash at the same time.'
       end
     else
-      exts = args.map(&:to_s)
+      extensions = args.map(&:to_s)
     end
 
-    if exts == self.extensions
+    if extensions == self.extensions
       self
     else
-      if self.only_filename?
-        Path "#{pure_name}.#{exts.join('.')}"
+      if only_filename?
+        Path "#{pure_name}.#{extensions.join('.')}"
       else
-        self.dirname.join "#{pure_name}.#{exts.join('.')}"
+        dirname.join "#{pure_name}.#{extensions.join('.')}"
       end
     end
   end
@@ -146,11 +147,11 @@ class Path
   # @return [Path] Path to new filename.
   #
   def replace_extension(*args)
-    exts = self.extensions
-    exts.pop
-    exts += args.flatten
+    extensions = self.extensions
+    extensions.pop
+    extensions += args.flatten
 
-    replace_extensions exts
+    replace_extensions extensions
   end
 
 end
