@@ -250,4 +250,39 @@ class Path
       self
     end
   end
+
+  # Return a relative path from the given base path to the receiver path.
+  #
+  # Both paths need to be either absolute or relative otherwise an error
+  # will be raised. The file system will not be accessed and no symlinks are
+  # assumed.
+  #
+  # @example
+  #   relative = Path('src/lib/module1/class.rb')
+  #     .relative_from('src/lib/module2')
+  #   #=> <Path '../module1/class.rb'>
+  #
+  # @return [Path] Relative path from argument to receiver.
+  # @see Pathname#relative_path_from
+  #
+  def relative_from(base)
+    base, path = Path(base).cleanpath, cleanpath
+
+    if (base.relative? && path.absolute?) || (base.absolute? && path.relative?)
+      raise ArgumentError.new \
+        "Different prefix: #{base.inspect} and #{path.inspect}"
+    end
+
+    base, path = base.components, path.components
+    base.shift && path.shift while base.first == path.first
+
+    Path(*(base.map{ '..' } + path))
+  end
+  alias_method :relative_path_from, :relative_from
+
+  protected
+
+  def cleanpath
+    Path Pathname.new(self).cleanpath
+  end
 end

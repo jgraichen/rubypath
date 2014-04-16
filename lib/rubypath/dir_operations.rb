@@ -64,8 +64,8 @@ class Path
   end
 
   #
-  def glob(pattern, flags = ::File::FNM_EXTGLOB)
-    Path.glob ::File.join(escaped_glob_path, pattern), flags
+  def glob(pattern, flags = ::File::FNM_EXTGLOB, &block)
+    Path.glob(::File.join(escaped_glob_path, pattern), flags, &block)
   end
 
   private

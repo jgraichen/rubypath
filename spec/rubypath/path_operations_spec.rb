@@ -269,6 +269,39 @@ describe Path do
       end
     end
 
+    describe_method :relative_from, aliases: [:relative_path_from] do
+      let(:base) { Path '/path/three/four/five' }
+      let(:path) { Path '/path/one/two' }
+      subject { path.relative_from base }
+
+      it { should eq '../../../one/two' }
+
+      context 'with collapsing paths' do
+        let(:base) { Path '/path/one/two'  }
+        let(:path) { Path '/path/one' }
+        it { should eq '..' }
+      end
+
+      context 'with relative paths' do
+        let(:base) { Path 'path/one'  }
+        let(:path) { Path 'path/two' }
+        it { should eq '../two' }
+      end
+
+      context 'with mixed paths' do
+        let(:base) { Path '/root/path/one'  }
+        let(:path) { Path 'path/two' }
+        subject { ->{ path.relative_from base } }
+        it { should raise_error ArgumentError }
+      end
+
+      context 'with dots in path' do
+        let(:base) { Path '/path/one/three/../two'  }
+        let(:path) { Path '/path/one/two/six' }
+        it { should eq 'six' }
+      end
+    end
+
     describe_method :ascend, aliases: [:each_ancestors] do
       shared_examples 'ascend' do
         context 'with block' do
