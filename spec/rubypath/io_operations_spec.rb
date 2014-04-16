@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Path do
+  let(:delta) { 1.0 }
+
   describe 'IO Operations' do
     with_backends :mock, :sys do
 
@@ -18,7 +20,7 @@ describe Path do
 
           it 'should update access time' do
             subject
-            expect(path.atime).to be_within(0.1).of(Time.now)
+            expect(path.atime).to be_within(delta).of(Time.now)
           end
 
           context 'with read length and offset' do
@@ -80,7 +82,7 @@ describe Path do
 
           it 'should update mtime' do
             expect{ subject }.to change{ path.mtime }
-            expect(path.mtime).to be_within(0.1).of(Time.now)
+            expect(path.mtime).to be_within(delta).of(Time.now)
           end
 
           it 'should not update atime' do
@@ -112,12 +114,12 @@ describe Path do
 
           it 'should set mtime' do
             subject
-            expect(path.mtime).to be_within(0.1).of(Time.now)
+            expect(path.mtime).to be_within(delta).of(Time.now)
           end
 
           it 'should set atime' do
             subject
-            expect(path.atime).to be_within(0.1).of(Time.now)
+            expect(path.atime).to be_within(delta).of(Time.now)
           end
         end
       end

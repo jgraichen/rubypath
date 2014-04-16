@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Path do
+  let(:delta) { 1.0 }
+
   describe 'File Operations' do
     with_backends :mock, :sys do
       let(:path) { Path('/path/to/file.txt') }
@@ -28,7 +30,7 @@ describe Path do
 
           it 'should update modification time' do
             subject
-            expect(expected_path.mtime).to be_within(1).of(Time.now)
+            expect(expected_path.mtime).to be_within(delta).of(Time.now)
           end
         end
 
@@ -76,7 +78,7 @@ describe Path do
 
           it 'should should update modification time' do
             subject
-            expect(path.mtime).to be_within(1).of(Time.now)
+            expect(path.mtime).to be_within(delta).of(Time.now)
           end
         end
 
@@ -259,7 +261,7 @@ describe Path do
         subject { path.send described_method }
 
         it 'should return file modification time' do
-          should be_within(0.1).of(Time.now)
+          should be_within(delta).of(Time.now)
         end
 
         context 'with modification time changed' do
@@ -288,7 +290,7 @@ describe Path do
         context 'new create file' do
           before { path.touch }
 
-          it { should be_within(0.1).of(Time.now) }
+          it { should be_within(delta).of(Time.now) }
         end
 
         context 'with existing file' do
@@ -298,7 +300,7 @@ describe Path do
             before { path.touch }
             before { sleep 0.3 }
 
-            it { should be_within(0.1).of(Time.now - 0.3) }
+            it { should be_within(delta).of(Time.now - 0.3) }
           end
 
           context 'and changed access time' do
