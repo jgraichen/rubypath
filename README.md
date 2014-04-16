@@ -1,5 +1,11 @@
 # Ruby Path
 
+[![Gem Version](https://badge.fury.io/rb/rubypath.svg)](http://badge.fury.io/rb/rubypath)
+[![Build Status](http://img.shields.io/travis/jgraichen/rubypath/master.svg)](https://travis-ci.org/jgraichen/rubypath)
+[![Coverage Status](http://img.shields.io/coveralls/jgraichen/rubypath/master.svg)](https://coveralls.io/r/jgraichen/rubypath)
+[![Dependency Status](http://img.shields.io/gemnasium/jgraichen/rubypath.svg)](https://gemnasium.com/jgraichen/rubypath)
+[![RubyDoc Documentation](http://img.shields.io/badge/rubydoc-here-blue.svg)](http://rubydoc.info/github/jgraichen/rubypath/master/frames)
+
 *Ruby Path* introduces a global `Path` class unifying most `File`, `Dir`, `FileUtils`, `Pathname` and `IO` operations with a flexible and powerful Object-Interface and still adding new useful methods and functions like mocking a while file system for fast and reliable testing.
 
 ## Installation
