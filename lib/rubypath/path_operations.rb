@@ -276,7 +276,7 @@ class Path
     base, path = base.components, path.components
     base.shift && path.shift while base.first == path.first
 
-    Path(*(base.map{ '..' } + path))
+    Path(*((['..'] * base.size) + path))
   end
   alias_method :relative_path_from, :relative_from
 
