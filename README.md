@@ -8,7 +8,66 @@ Add `rubypath` to your Gemfile, `gemspec` or install manually.
 
 ## Usage
 
-TODO
+Using `Path` with file and directory methods:
+
+```
+base = Path '/path/to/base'
+src  = base.mkpath 'project/src'
+src.touch 'Rakefile'
+src.mkdir('lib').mkdir('mylib').touch('version.rb')
+#=> <Path '/path/to/base/project/src/lib/mylib/version.rb'
+```
+
+Using IO:
+
+```
+src.write "module Mylib\n  VERSION = '0.1.0'\nend"
+
+src.lookup('project.yml').read
+#=> "..."
+```
+
+### Mock FS in tests
+
+Wrap specific or just all specs in a virtual filesystem:
+
+```
+# spec_helper.rb
+
+config.around(:each) do |example|
+  Path::Backend.mock root: :tmp, &example
+end
+```
+
+Supported options for `:root` are `:tmp` using the real filesystem but scoping all actions into a temporary directory similar to chroot or a custom defined path to use as "chroot" directory. This mode does not allow to stub users, home directories and some attributes.
+
+If not `:root` is specified a completely virtual in-memory filesystem will be used. This backend allows to even specify available users and home directories, the current user etc.
+
+You can then define a specific scenario in your specs:
+
+```ruby
+    before do
+      Path.mock do |root, backend|
+        backend.cwd          = '/root'
+        backend.current_user = 'test'
+        backend.homes        = {'test' => '/home/test'}
+
+        home = root.mkpath('/home/test')
+        home.mkfile('src/test.txt').write 'CONTENT'
+        home.mkfile('src/test.html').write '<html><head><title></title>...'
+      end
+    end
+
+    it 'should mock all FS' do
+      base = Path('~test').expand
+      expect(base.join(%w(src test.txt)).read).to eq 'CONTENT'
+
+      files = base.glob('**/*').select{|p| p.file? }
+      expect(files.size).to eq 2
+    end
+```
+
+See full API documentation here: http://rubydoc.info/gems/rubypath/Path
 
 ## Contributing
 
