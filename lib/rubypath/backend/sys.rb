@@ -50,6 +50,8 @@ class Path::Backend
       raise Errno::EISDIR.new path
     rescue Errno::ENOTDIR
       raise Errno::ENOTDIR.new path
+    rescue Errno::EACCES
+      raise Errno::EACCES.new path
     end
 
     ## OPERATIONS
