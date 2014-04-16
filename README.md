@@ -10,7 +10,7 @@ Add `rubypath` to your Gemfile, `gemspec` or install manually.
 
 Using `Path` with file and directory methods:
 
-```
+```ruby
 base = Path '/path/to/base'
 src  = base.mkpath 'project/src'
 src.touch 'Rakefile'
@@ -20,7 +20,7 @@ src.mkdir('lib').mkdir('mylib').touch('version.rb')
 
 Using IO:
 
-```
+```ruby
 src.write "module Mylib\n  VERSION = '0.1.0'\nend"
 
 src.lookup('project.yml').read
@@ -31,7 +31,7 @@ src.lookup('project.yml').read
 
 Wrap specific or just all specs in a virtual filesystem:
 
-```
+```ruby
 # spec_helper.rb
 
 config.around(:each) do |example|
