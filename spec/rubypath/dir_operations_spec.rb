@@ -26,9 +26,11 @@ describe Path do
                  /lib/path/file.rb /lib/path/ext.rb)
           end
 
-          it 'should return matching files (III)' do
-            expect(subject.call('/**/{dir,ext}.rb')).to match_array \
-              %w(/lib/path/dir.rb /lib/path/ext.rb)
+          if defined?(::File::FNM_EXTGLOB)
+            it 'should return matching files (III)' do
+              expect(subject.call('/**/{dir,ext}.rb')).to match_array \
+                %w(/lib/path/dir.rb /lib/path/ext.rb)
+            end
           end
 
           it 'should return matching files (IV)' do

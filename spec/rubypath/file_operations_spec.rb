@@ -209,10 +209,12 @@ describe Path do
               .to eq path.join('a/config.yml').expand
           end
 
-          it 'should find first file that match (II)' do
-            expect(path.join('a/b')
-              .send(described_method, 'config.{yml,yaml}'))
-              .to eq path.join('a/config.yml').expand
+          if defined?(::File::FNM_EXTGLOB)
+            it 'should find first file that match (II)' do
+              expect(path.join('a/b')
+                .send(described_method, 'config.{yml,yaml}'))
+                .to eq path.join('a/config.yml').expand
+            end
           end
 
           it 'should find first file that dotmatch' do

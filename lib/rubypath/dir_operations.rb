@@ -10,11 +10,23 @@ class Path
       new Backend.instance.getwd
     end
 
-    def glob(pattern, flags = ::File::FNM_EXTGLOB)
+    def glob(pattern, flags = nil)
+      flags = default_glob_flags(flags)
+
       if block_given?
         Backend.instance.glob(pattern, flags) {|path| yield Path path }
       else
         Backend.instance.glob(pattern, flags).map(&Path)
+      end
+    end
+
+    # @!visibility private
+    #
+    def default_glob_flags(flags)
+      if flags.nil? && defined?(::File::FNM_EXTGLOB)
+        ::File::FNM_EXTGLOB
+      else
+        flags.to_i
       end
     end
   end
@@ -64,7 +76,7 @@ class Path
   end
 
   #
-  def glob(pattern, flags = ::File::FNM_EXTGLOB, &block)
+  def glob(pattern, flags = nil, &block)
     Path.glob(::File.join(escaped_glob_path, pattern), flags, &block)
   end
 

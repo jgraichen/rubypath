@@ -79,7 +79,9 @@ class Path
   #   Defaults to `File::FNM_EXTGLOB`.
   # @return [Path] Path to found file or nil.
   #
-  def lookup(pattern, flags = ::File::FNM_EXTGLOB)
+  def lookup(pattern, flags = nil)
+    flags = self.class.default_glob_flags(flags)
+
     expand.ascend do |path|
       case pattern
         when String
