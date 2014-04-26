@@ -79,9 +79,17 @@ See full API documentation here: http://rubydoc.info/gems/rubypath/Path
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+3. Add specs testing SYS *and* MOCK file system
+4. Commit your specs (`git commit -am 'Add specs for feature'`)
+5. Add our changes for SYS *and* MOCK file system
+6. Commit your changes (`git commit -am 'Add some feature'`)
+7. Push to the branch (`git push origin my-new-feature`)
+8. Create new Pull Request
+
+### ToDos
+
+* Add missing methods
+* Improve MOCK FS implementation
 
 ## License
 
