@@ -17,6 +17,10 @@ class Path
   #   Path('/path/to/file.txt').touch
   #   #=> <Path:"/path/to/file.txt">
   #
+  # @example
+  #   Path('/path/to').touch('file.txt')
+  #   #=> <Path:"/path/to/file.txt">
+  #
   # @return [Path] Path to touched file.
   #
   def touch(*args)
@@ -26,6 +30,21 @@ class Path
     end
   end
 
+  # Removes file at current path.
+  #
+  # Raise an error if file does not exists or is a directory.
+  #
+  # @example
+  #   Path('/file.txt').touch.unlink
+  #   #=> <Path /file.txt>
+  #
+  # @example
+  #   Path('/file.txt').touch
+  #   Path('/').unlink('file.txt')
+  #   #=> <Path /file.txt>
+  #
+  # @return [Path] Unlinked path.
+  #
   def unlink(*args)
     with_path(*args) do |path|
       invoke_backend :unlink, path
