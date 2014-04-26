@@ -26,6 +26,13 @@ class Path
     end
   end
 
+  def unlink(*args)
+    with_path(*args) do |path|
+      invoke_backend :unlink, path
+      Path path
+    end
+  end
+
   # Create a file at pointed location and all missing parent directories.
   #
   # Given arguments will be joined with current path before directories and

@@ -15,6 +15,45 @@ describe Path do
         end
       end
 
+      describe_method :unlink do
+        subject { path.send described_method }
+
+        context 'on non-existent file' do
+          it { expect{ subject }.to raise_error Errno::ENOENT }
+        end
+
+        context 'on existent file' do
+          before { path.mkfile }
+
+          it 'should unlink file' do
+            expect{ subject }.to change(path, :exist?).from(true).to(false)
+          end
+        end
+
+        context 'on existent directory' do
+          before { path.mkpath }
+
+          it { expect{ subject }.to raise_error Errno::EISDIR }
+        end
+
+        context 'with args' do
+          subject { path.send(described_method, 'file') }
+
+          context 'on non-existent file' do
+            it { expect{ subject }.to raise_error Errno::ENOENT }
+          end
+
+          context 'on existent file' do
+            before { path.mkfile('file') }
+
+            it 'should unlink file' do
+              expect{ subject }
+                .to change(path.join('file'), :exist?).from(true).to(false)
+            end
+          end
+        end
+      end
+
       describe_method :touch do
         let(:path) { Path '/rubypath' }
         let(:args) { Array.new }

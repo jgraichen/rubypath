@@ -137,5 +137,9 @@ class Path::Backend
     def chmod(path, mode)
       fs path, ::File, :chmod, mode, r(path)
     end
+
+    def unlink(path)
+      fs path, ::File, :unlink, r(path)
+    end
   end
 end

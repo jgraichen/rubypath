@@ -64,6 +64,7 @@ class Path
     delegate :set_umask
     delegate :mode
     delegate :chmod
+    delegate :unlink
   end
 
   private

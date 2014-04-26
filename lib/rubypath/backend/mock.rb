@@ -164,6 +164,21 @@ class Path::Backend
       lookup!(path).mode
     end
 
+    def unlink(path)
+      node = lookup_parent!(path)
+      file = node.lookup ::File.basename path
+      case file
+        when Dir
+          raise Errno::EISDIR.new path
+        when File
+          node.children.delete(file)
+        when nil
+          raise Errno::ENOENT.new path
+        else
+          raise ArgumentError.new "Unknown node #{node.inspect} for #unlink."
+      end
+    end
+
     # @!group Internal Virtual File System
 
     # Return root node.
