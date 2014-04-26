@@ -9,13 +9,10 @@ class Path
   # @return [Boolean] True if object represents same path.
   #
   def eql?(other)
-    case other
-      when String
-        internal_path.eql? other
-      when Path
-        internal_path.eql? other.path
-      else
-        Path.new(other).eql?(self) if Path.like? other
+    if other.is_a?(Path)
+      cleanpath.internal_path == other.cleanpath.internal_path
+    else
+      Path.new(other).eql?(self) if Path.like?(other)
     end
   end
   alias_method :==, :eql?

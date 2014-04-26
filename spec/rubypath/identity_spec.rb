@@ -4,7 +4,7 @@ describe Path do
   describe 'Identity' do
     let(:str)  { '/path/to/file' }
     let(:args) { [str] }
-    let(:path) { described_class.new *args }
+    let(:path) { described_class.new(*args) }
     subject { path }
 
     describe_method :path, aliases: [:to_path, :to_str, :to_s] do

@@ -280,9 +280,26 @@ class Path
   end
   alias_method :relative_path_from, :relative_from
 
-  protected
-
+  # Return cleaned path with all dot components removed.
+  #
+  # No file system will accessed and not symlinks will be resolved.
+  #
+  # @example
+  #   Path('./file.txt').cleanpath
+  #   #=> <Path file.txt>
+  #
+  # @example
+  #   Path('path/to/another/../file/../../txt').cleanpath
+  #   #=> <Path path/txt>
+  #
+  # @return [Path] Cleaned path.
+  #
   def cleanpath
-    Path Pathname.new(self).cleanpath
+    path = Pathname.new(self).cleanpath
+    if path == internal_path
+      self
+    else
+      Path path
+    end
   end
 end
