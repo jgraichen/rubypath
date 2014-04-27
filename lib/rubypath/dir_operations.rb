@@ -31,6 +31,8 @@ class Path
     end
   end
 
+  # @!group Directory Operations
+
   # Create directory.
   #
   # Given arguments will be joined with current path before directory is
@@ -78,6 +80,76 @@ class Path
   #
   def glob(pattern, flags = nil, &block)
     Path.glob(::File.join(escaped_glob_path, pattern), flags, &block)
+  end
+
+  # Removes file or directory. If it's a directory it will be removed
+  # recursively.
+  #
+  # WARNING: This method causes local vulnerability if one of parent
+  # directories or removing directory tree are world writable (including
+  # `/tmp`, whose permission is 1777), and the current process has strong
+  # privilege such as Unix super user (root), and the system has symbolic link.
+  # For secure removing see {#safe_rmtree}.
+  #
+  # @return [Path] Path to removed file or directory.
+  #
+  def rmtree(*args)
+    with_path(*args) do |path|
+      invoke_backend :rmtree, internal_path
+      Path path
+    end
+  end
+  alias_method :rm_rf, :rmtree
+
+  # Removes file or directory. If it's a directory it will be removed
+  # recursively.
+  #
+  # This method uses #{FileUtils#remove_entry_secure} to avoid TOCTTOU
+  # (time-of-check-to-time-of-use) local security vulnerability of {#rmtree}.
+  # {#rmtree} causes security hole when:
+  #
+  # * Parent directory is world writable (including `/tmp`).
+  # * Removing directory tree includes world writable directory.
+  # * The system has symbolic link.
+  #
+  # @return [Path] Path to removed file or directory.
+  #
+  def safe_rmtree(*args)
+    with_path(*args) do |path|
+      invoke_backend :safe_rmtree, internal_path
+      Path path
+    end
+  end
+
+  # Removes file or directory. If it's a directory it will be removed
+  # recursively.
+  #
+  # This method behaves exactly like {#rmtree} but will raise exceptions
+  # e.g. when file does not exist.
+  #
+  # @return [Path] Path to removed file or directory.
+  #
+  def rmtree!(*args)
+    with_path(*args) do |path|
+      invoke_backend :rmtree!, internal_path
+      Path path
+    end
+  end
+  alias_method :rm_r, :rmtree!
+
+  # Removes file or directory. If it's a directory it will be removed
+  # recursively.
+  #
+  # This method behaves exactly like {#safe_rmtree} but will raise exceptions
+  # e.g. when file does not exist.
+  #
+  # @return [Path] Path to removed file or directory.
+  #
+  def safe_rmtree!(*args)
+    with_path(*args) do |path|
+      invoke_backend :safe_rmtree!, internal_path
+      Path path
+    end
   end
 
   private

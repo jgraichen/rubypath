@@ -141,5 +141,21 @@ class Path::Backend
     def unlink(path)
       fs path, ::File, :unlink, r(path)
     end
+
+    def rmtree(path)
+      fs path, ::FileUtils, :rm_r, r(path), force: true
+    end
+
+    def rmtree!(path)
+      fs path, ::FileUtils, :rm_r, r(path)
+    end
+
+    def safe_rmtree(path)
+      fs path, ::FileUtils, :rm_r, r(path), force: true, secure: true
+    end
+
+    def safe_rmtree!(path)
+      fs path, ::FileUtils, :rm_r, r(path), secure: true
+    end
   end
 end

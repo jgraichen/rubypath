@@ -65,6 +65,10 @@ class Path
     delegate :mode
     delegate :chmod
     delegate :unlink
+    delegate :rmtree
+    delegate :rmtree!
+    delegate :safe_rmtree
+    delegate :safe_rmtree!
   end
 
   private

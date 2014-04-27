@@ -39,6 +39,83 @@ describe Path do
         end
       end
 
+      shared_examples '#remove_recursive' do
+        context 'on existent file' do
+          before { path.mkfile }
+          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+        end
+
+        context 'on existent directory' do
+          before { path.mkpath }
+          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+        end
+
+        context 'on existent directory with children' do
+          before { path.mkfile('subdir/file') }
+          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+        end
+      end
+
+      describe_method :rmtree, aliases: [:rm_rf] do
+        let(:path) { Path '/path' }
+        subject { path.send(described_method) }
+
+        context 'on non-existent file' do
+          it { expect{ subject }.to_not raise_error }
+        end
+
+        it_behaves_like '#remove_recursive'
+      end
+
+      describe_method :safe_rmtree do
+        let(:path) { Path '/path' }
+        subject { path.send(described_method) }
+
+        it 'should use #remove_entry_secure' do
+          if backend_type == :sys
+            path.mkfile
+            expect(FileUtils).to receive(:remove_entry_secure).and_call_original
+            subject
+          end
+        end
+
+        context 'on non-existent file' do
+          it { expect{ subject }.to_not raise_error }
+        end
+
+        it_behaves_like '#remove_recursive'
+      end
+
+      describe_method :rmtree!, aliases: [:rm_r] do
+        let(:path) { Path '/path' }
+        subject { path.send(described_method) }
+
+        context 'on non-existent file' do
+          it { expect{ subject }.to raise_error Errno::ENOENT }
+        end
+
+        it_behaves_like '#remove_recursive'
+      end
+
+      describe_method :safe_rmtree! do
+        let(:path) { Path '/path' }
+        subject { path.send(described_method) }
+
+        it 'should use #remove_entry_secure' do
+          if backend_type == :sys
+            path.mkfile
+            expect(FileUtils).to receive(:remove_entry_secure).and_call_original
+            subject
+          end
+        end
+
+        context 'on non-existent file' do
+          it { expect{ subject }.to raise_error Errno::ENOENT }
+        end
+
+        it_behaves_like '#remove_recursive'
+      end
+
       describe '#glob' do
         it 'should delegate to class#glob' do
           expect(Path).to receive(:glob)
@@ -130,7 +207,7 @@ describe Path do
           end
 
           it 'should return list of Path objects' do
-            subject.each{|e| expect(e).to be_a Path }
+            subject.each{ |e| expect(e).to be_a Path }
           end
         end
 

@@ -179,6 +179,32 @@ class Path::Backend
       end
     end
 
+    def rmtree(path)
+      node = lookup path
+      case node
+        when Dir, File
+          lookup_parent!(path).children.delete(node)
+        when nil
+          nil
+        else
+          raise ArgumentError.new "Unknown node #{node.inspect} for #rmtree."
+      end
+    end
+    alias_method :safe_rmtree, :rmtree
+
+    def rmtree!(path)
+      node = lookup path
+      case node
+        when Dir, File
+          lookup_parent!(path).children.delete(node)
+        when nil
+          raise Errno::ENOENT.new path
+        else
+          raise ArgumentError.new "Unknown node #{node.inspect} for #rmtree."
+      end
+    end
+    alias_method :safe_rmtree!, :rmtree!
+
     # @!group Internal Virtual File System
 
     # Return root node.
