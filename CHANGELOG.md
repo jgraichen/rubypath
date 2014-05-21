@@ -1,5 +1,15 @@
 # Changes
 
+## 0.3.1
+
+* Fix missing require 'tmpdir' for using with mocked backend
+
+## 0.3.0
+
+* Add #unlink
+* Add #cleanpath
+* Add #rmtree, #rmtree!, and safe variants
+
 ## 0.2.0
 
 * Add #relative_from
