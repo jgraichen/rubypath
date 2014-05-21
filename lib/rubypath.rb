@@ -1,4 +1,5 @@
 require 'rubypath/version'
+require 'tmpdir'
 
 #
 #
