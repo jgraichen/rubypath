@@ -63,6 +63,11 @@ describe Path do
         let(:path) { Path 'path/to/../../opath/to/./../file.txt' }
         it { should eq 'opath/file.txt' }
       end
+
+      context 'with trailing slash' do
+        let(:path) { Path 'path/to/../../dir/' }
+        it { expect(subject.to_s).to eq 'dir/' }
+      end
     end
 
     describe_method :each_component do
@@ -104,6 +109,13 @@ describe Path do
 
       it { should be_a Array }
       it { should eq %w(path to templates index.html) }
+
+      context 'with should include leading empty components' do
+        let(:str) { 'path/to/dir/' }
+        subject { path.send described_method, empty: true }
+
+        it { should eq ['path', 'to', 'dir', ''] }
+      end
     end
 
     describe_method :dirname, aliases: [:parent] do
@@ -330,6 +342,26 @@ describe Path do
         let(:base) { Path '/path/one/three/../two'  }
         let(:path) { Path '/path/one/two/six' }
         it { should eq 'six' }
+      end
+
+      context 'with same path (I)' do
+        let(:base) { Path '/path/one/two/six'  }
+        let(:path) { Path '/path/one/two/six' }
+        it { should eq '.' }
+        it { expect(subject.to_s).to eq '.' }
+      end
+
+      context 'with same path (I)' do
+        let(:base) { Path '/'  }
+        let(:path) { Path '/' }
+        it { should eq '.' }
+        it { expect(subject.to_s).to eq '.' }
+      end
+
+      describe 'preserve trailing slash' do
+        let(:base) { Path('/blog/2014/06/my-blog-title-1/').dirname  }
+        let(:path) { Path '/blog/2014/07/another-blog-title/' }
+        it { expect(subject.to_s).to eq '../07/another-blog-title/' }
       end
     end
 

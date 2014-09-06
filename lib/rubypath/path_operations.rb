@@ -82,8 +82,8 @@ class Path
   #
   # @return [Array<String>] File names.
   #
-  def components
-    each_component.to_a
+  def components(*args)
+    each_component(*args).to_a
   end
 
   # Converts a pathname to an absolute pathname. Given arguments will be
@@ -268,13 +268,15 @@ class Path
   def relative_from(base)
     base, path = Path(base).cleanpath, cleanpath
 
+    return Path '.' if base == path
+
     if (base.relative? && path.absolute?) || (base.absolute? && path.relative?)
       raise ArgumentError.new \
         "Different prefix: #{base.inspect} and #{path.inspect}"
     end
 
-    base, path = base.components, path.components
-    base.shift && path.shift while base.first == path.first
+    base, path = base.components(empty: true), path.components(empty: true)
+    base.shift && path.shift while base.first == path.first && !(base.empty? || path.empty?)
 
     Path(*((['..'] * base.size) + path))
   end
@@ -299,7 +301,11 @@ class Path
     if path == internal_path
       self
     else
-      Path path
+      if internal_path[-1] == Path.separator
+        Path path, ''
+      else
+        Path path
+      end
     end
   end
 end
