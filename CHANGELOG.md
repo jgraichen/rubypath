@@ -1,5 +1,10 @@
 # Changes
 
+## 0.3.2
+
+* Fix infinite loop bug in #relative_from
+* Fix handling of trailing slash in #cleanpath (and depended methods)
+
 ## 0.3.1
 
 * Fix missing require 'tmpdir' for using with mocked backend
