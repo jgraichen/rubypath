@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby RUBY_VERSION if ENV['CI']
+
 gem 'rake'
 
 group :test do
