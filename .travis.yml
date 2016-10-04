@@ -16,3 +16,6 @@ before_install:
 - rvm reload
 - rvm use $TRAVIS_RUBY_VERSION --install --fuzzy
 - rvm @global do gem install bundler
+- ruby --version
+- bundle --version
+- gem --version
