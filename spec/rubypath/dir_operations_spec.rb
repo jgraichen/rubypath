@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -14,7 +15,7 @@ describe Path do
               root.mkfile '/lib/path/ext.rb'
             end
           end
-          subject { ->(*args){ Path.glob(*args) } }
+          subject { ->(*args) { Path.glob(*args) } }
 
           it 'should return matching files (I)' do
             expect(subject.call('/*')).to match_array %w(/file.txt /lib)
@@ -42,17 +43,17 @@ describe Path do
       shared_examples '#remove_recursive' do
         context 'on existent file' do
           before { path.mkfile }
-          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
         end
 
         context 'on existent directory' do
           before { path.mkpath }
-          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
         end
 
         context 'on existent directory with children' do
           before { path.mkfile('subdir/file') }
-          it{ expect{ subject }.to change(path, :exist?).from(true).to(false) }
+          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
         end
       end
 
@@ -61,7 +62,7 @@ describe Path do
         subject { path.send(described_method) }
 
         context 'on non-existent file' do
-          it { expect{ subject }.to_not raise_error }
+          it { expect { subject }.to_not raise_error }
         end
 
         it_behaves_like '#remove_recursive'
@@ -80,7 +81,7 @@ describe Path do
         end
 
         context 'on non-existent file' do
-          it { expect{ subject }.to_not raise_error }
+          it { expect { subject }.to_not raise_error }
         end
 
         it_behaves_like '#remove_recursive'
@@ -91,7 +92,7 @@ describe Path do
         subject { path.send(described_method) }
 
         context 'on non-existent file' do
-          it { expect{ subject }.to raise_error Errno::ENOENT }
+          it { expect { subject }.to raise_error Errno::ENOENT }
         end
 
         it_behaves_like '#remove_recursive'
@@ -110,7 +111,7 @@ describe Path do
         end
 
         context 'on non-existent file' do
-          it { expect{ subject }.to raise_error Errno::ENOENT }
+          it { expect { subject }.to raise_error Errno::ENOENT }
         end
 
         it_behaves_like '#remove_recursive'
@@ -148,8 +149,9 @@ describe Path do
             subject { dir.mkdir }
 
             it 'should raise some error' do
-              expect{ subject }.to raise_error(
-                Errno::ENOENT, 'No such file or directory - /non-ext/dir')
+              expect { subject }.to raise_error(
+                Errno::ENOENT, 'No such file or directory - /non-ext/dir'
+              )
             end
           end
         end
@@ -191,7 +193,7 @@ describe Path do
 
       describe_method :entries do
         let(:path) { Path '/' }
-        let(:args) { Array.new }
+        let(:args) { [] }
         subject { path.send described_method, *args }
 
         context 'with directory with children' do
@@ -207,7 +209,7 @@ describe Path do
           end
 
           it 'should return list of Path objects' do
-            subject.each{ |e| expect(e).to be_a Path }
+            subject.each {|e| expect(e).to be_a Path }
           end
         end
 
@@ -215,8 +217,9 @@ describe Path do
           let(:path) { Path '/non-existent-dir' }
 
           it 'should raise error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOENT, 'No such file or directory - /non-existent-dir')
+            expect { subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /non-existent-dir'
+            )
           end
         end
       end

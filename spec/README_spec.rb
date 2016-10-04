@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe 'README examples' do
@@ -20,7 +21,7 @@ describe 'README examples' do
       base = Path('~test').expand
       expect(base.join(%w(src test.txt)).read).to eq 'CONTENT'
 
-      files = base.glob('**/*').select{|p| p.file? }
+      files = base.glob('**/*').select(&:file?)
       expect(files.size).to eq 2
     end
   end

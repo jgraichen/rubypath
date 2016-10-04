@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   module VERSION
     MAJOR = 0
@@ -6,6 +7,8 @@ class Path
     STAGE = nil
     STRING = [MAJOR, MINOR, PATCH, STAGE].reject(&:nil?).join('.').freeze
 
-    def self.to_s; STRING end
+    def self.to_s
+      STRING
+    end
   end
 end

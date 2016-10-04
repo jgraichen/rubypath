@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rspec'
 
 if ENV['CI'] || (defined?(:RUBY_ENGINE) && RUBY_ENGINE != 'rbx')
@@ -12,7 +13,7 @@ Bundler.require :default, :test
 
 require 'rubypath'
 
-Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f}
+Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
 
 RSpec.configure do |config|
   # ## Mock Framework

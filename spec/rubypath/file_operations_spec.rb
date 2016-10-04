@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -19,35 +20,35 @@ describe Path do
         subject { path.send described_method }
 
         context 'on non-existent file' do
-          it { expect{ subject }.to raise_error Errno::ENOENT }
+          it { expect { subject }.to raise_error Errno::ENOENT }
         end
 
         context 'on existent file' do
           before { path.mkfile }
 
           it 'should unlink file' do
-            expect{ subject }.to change(path, :exist?).from(true).to(false)
+            expect { subject }.to change(path, :exist?).from(true).to(false)
           end
         end
 
         context 'on existent directory' do
           before { path.mkpath }
 
-          it { expect{ subject }.to raise_error Errno::EISDIR }
+          it { expect { subject }.to raise_error Errno::EISDIR }
         end
 
         context 'with args' do
           subject { path.send(described_method, 'file') }
 
           context 'on non-existent file' do
-            it { expect{ subject }.to raise_error Errno::ENOENT }
+            it { expect { subject }.to raise_error Errno::ENOENT }
           end
 
           context 'on existent file' do
             before { path.mkfile('file') }
 
             it 'should unlink file' do
-              expect{ subject }
+              expect { subject }
                 .to change(path.join('file'), :exist?).from(true).to(false)
             end
           end
@@ -56,7 +57,7 @@ describe Path do
 
       describe_method :touch do
         let(:path) { Path '/rubypath' }
-        let(:args) { Array.new }
+        let(:args) { [] }
         let(:expected_path) { path }
         subject { path.touch(*args) }
         before { expect(path).to_not be_existent }
@@ -102,8 +103,9 @@ describe Path do
           before { path.parent.write 'ABC' }
 
           it 'should raise ENOTDIR error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOTDIR, 'Not a directory - /rubypath/file')
+            expect { subject }.to raise_error(
+              Errno::ENOTDIR, 'Not a directory - /rubypath/file'
+            )
           end
         end
 
@@ -125,26 +127,27 @@ describe Path do
           let(:path) { Path '/dir/file' }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOENT, 'No such file or directory - /dir/file')
+            expect { subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /dir/file'
+            )
           end
         end
       end
 
       describe_method :mkfile do
         let(:path) { Path '/path/to/file.txt' }
-        let(:args) { Array.new }
+        let(:args) { [] }
         let(:expected_path) { path.dup }
         subject { path.send described_method, *args }
 
         shared_examples '#mkfile' do
           it 'should create all missing directories' do
-            expect{ subject }.to change{ expected_path.parent.directory? }
+            expect { subject }.to change { expected_path.parent.directory? }
               .from(false).to(true)
           end
 
           it 'should create file' do
-            expect{ subject }.to change{ expected_path.file? }
+            expect { subject }.to change { expected_path.file? }
               .from(false).to(true)
           end
         end
@@ -162,8 +165,9 @@ describe Path do
           before { path.mkpath }
 
           it 'should raise ENOENT error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOENT, 'No such file or directory - /path/to/file.txt')
+            expect { subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /path/to/file.txt'
+            )
           end
         end
 
@@ -174,8 +178,9 @@ describe Path do
           end
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOTDIR, 'Not a directory - /path/to/file.txt')
+            expect { subject }.to raise_error(
+              Errno::ENOTDIR, 'Not a directory - /path/to/file.txt'
+            )
           end
         end
 
@@ -183,8 +188,9 @@ describe Path do
           let(:path) { Path '/' }
 
           it 'should raise EISDIR error' do
-            expect{ subject }.to raise_error(
-              Errno::ENOENT, 'No such file or directory - /')
+            expect { subject }.to raise_error(
+              Errno::ENOENT, 'No such file or directory - /'
+            )
           end
         end
       end
@@ -192,7 +198,7 @@ describe Path do
       describe_method :lookup do
         let(:path) { Path('~') }
         before do
-          Path.mock do |r|
+          Path.mock do |_r|
             path.mkpath 'a/b/c/d'
             path.touch 'a/test.txt'
             path.touch 'a/b/c/config.yaml'
@@ -304,10 +310,10 @@ describe Path do
         end
 
         context 'with modification time changed' do
-          before { path.mtime = Time.new(2175, 12, 24, 18, 00, 30) }
+          before { path.mtime = Time.new(2175, 12, 24, 18, 0o0, 30) }
 
           it 'should return file modification time' do
-            should eq Time.new(2175, 12, 24, 18, 00, 30)
+            should eq Time.new(2175, 12, 24, 18, 0o0, 30)
           end
         end
       end
@@ -315,10 +321,10 @@ describe Path do
       describe_method :mtime= do
         let(:path) { Path '/file.txt' }
         before { path.touch }
-        subject { path.send described_method, Time.new(2175, 12, 24, 18, 00, 30) }
+        subject { path.send described_method, Time.new(2175, 12, 24, 18, 0o0, 30) }
 
         it 'should change file modification time' do
-          expect{ subject }.to change{ path.mtime }.to Time.new(2175, 12, 24, 18, 00, 30)
+          expect { subject }.to change { path.mtime }.to Time.new(2175, 12, 24, 18, 0o0, 30)
         end
       end
 
@@ -343,10 +349,10 @@ describe Path do
           end
 
           context 'and changed access time' do
-            before { path.atime = Time.new(2175, 12, 24, 18, 00, 30) }
+            before { path.atime = Time.new(2175, 12, 24, 18, 0o0, 30) }
 
             it 'should return file access time' do
-              should eq Time.new(2175, 12, 24, 18, 00, 30)
+              should eq Time.new(2175, 12, 24, 18, 0o0, 30)
             end
           end
         end
@@ -355,10 +361,10 @@ describe Path do
       describe_method :atime= do
         let(:path) { Path '/file.txt' }
         before { path.touch }
-        subject { path.send described_method, Time.new(2175, 12, 24, 18, 00, 30) }
+        subject { path.send described_method, Time.new(2175, 12, 24, 18, 0o0, 30) }
 
         it 'should change file access time' do
-          expect{ subject }.to change{ path.atime }.to Time.new(2175, 12, 24, 18, 00, 30)
+          expect { subject }.to change { path.atime }.to Time.new(2175, 12, 24, 18, 0o0, 30)
         end
       end
 
@@ -368,12 +374,12 @@ describe Path do
 
         context 'with file' do
           before { path.touch }
-          it { should eq 0666 - Path.umask }
+          it { should eq 0o666 - Path.umask }
         end
 
         context 'with directory' do
           before { path.mkpath }
-          it { should eq 0777 - Path.umask }
+          it { should eq 0o777 - Path.umask }
         end
       end
     end
@@ -383,19 +389,19 @@ describe Path do
         with_backend :sys do
           it 'should set umask' do
             subject
-            expect(File.umask).to eq 0077
+            expect(File.umask).to eq 0o077
           end
         end
 
         with_backend :mock do
           it 'should set umask' do
-            expect{ subject }.to change{ Path.umask }.from(0022).to(0077)
+            expect { subject }.to change { Path.umask }.from(0o022).to(0o077)
           end
         end
       end
 
       describe_method :umask do
-        let(:args) { Array.new }
+        let(:args) { [] }
         subject { Path.send described_method, *args }
 
         context 'as getter' do
@@ -407,19 +413,19 @@ describe Path do
 
           with_backend :mock do
             it 'should return umask' do
-              should eq 0022
+              should eq 0o022
             end
           end
         end
 
         context 'as setter' do
-          let(:args) { [0077] }
+          let(:args) { [0o077] }
           it_behaves_like 'umask setter'
         end
       end
 
       describe_method :umask= do
-        let(:args) { [0077] }
+        let(:args) { [0o077] }
         subject { Path.send described_method, *args }
         it_behaves_like 'umask setter'
       end

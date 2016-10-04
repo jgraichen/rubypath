@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group Comparison
 
@@ -15,5 +16,5 @@ class Path
       Path.new(other).eql?(self) if Path.like?(other)
     end
   end
-  alias_method :==, :eql?
+  alias == eql?
 end

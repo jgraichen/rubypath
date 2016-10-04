@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 class Path::Backend
-
   class Mock
     attr_reader :user, :homes
 
@@ -23,11 +23,11 @@ class Path::Backend
       @user  = 'root'
       @homes = {'root' => '/root'}
       @cwd   = '/root'
-      @umask = 0022
+      @umask = 0o022
     end
 
     def home(user)
-      homes.fetch(user){ raise ArgumentError.new "user #{user} doesn't exist" }
+      homes.fetch(user) { raise ArgumentError.new "user #{user} doesn't exist" }
     end
 
     # @!group Backend Operations
@@ -39,7 +39,7 @@ class Path::Backend
         ::File.expand_path(path, base)
       end
     end
-    alias_method :expand, :expand_path
+    alias expand expand_path
 
     def getwd
       @cwd ||= '/'
@@ -100,12 +100,12 @@ class Path::Backend
       case file
         when File
           if args.empty?
-            file.content = content
+            file.content = String.new(content)
           else
             offset = args[0].to_i
             file.content[offset, content.length] = content
           end
-          file.mtime   = Time.now
+          file.mtime = Time.now
         when Dir
           raise Errno::EISDIR.new path
         else
@@ -146,7 +146,7 @@ class Path::Backend
       node.children.map(&:name) + %w(. ..)
     end
 
-    def glob(pattern, flags = 0, &block)
+    def glob(pattern, flags = 0)
       root.all.select do |node|
         ::File.fnmatch pattern, node.path, (flags | ::File::FNM_PATHNAME)
       end
@@ -190,7 +190,7 @@ class Path::Backend
           raise ArgumentError.new "Unknown node #{node.inspect} for #rmtree."
       end
     end
-    alias_method :safe_rmtree, :rmtree
+    alias safe_rmtree rmtree
 
     def rmtree!(path)
       node = lookup path
@@ -203,7 +203,7 @@ class Path::Backend
           raise ArgumentError.new "Unknown node #{node.inspect} for #rmtree."
       end
     end
-    alias_method :safe_rmtree!, :rmtree!
+    alias safe_rmtree! rmtree!
 
     # @!group Internal Virtual File System
 
@@ -252,7 +252,7 @@ class Path::Backend
     def lookup_parent!(path)
       node = lookup ::File.dirname expand path
       if node
-        node.is_a?(Dir) ? node : raise(Errno::ENOTDIR.new path)
+        node.is_a?(Dir) ? node : raise(Errno::ENOTDIR.new(path))
       else
         raise Errno::ENOENT.new path
       end
@@ -263,7 +263,7 @@ class Path::Backend
       attr_reader :sys, :name, :parent
       attr_accessor :mtime, :atime, :mode
 
-      def initialize(backend, name, ops = {})
+      def initialize(backend, name, _ops = {})
         @sys   = backend
         @name  = name
         @mtime = Time.now
@@ -278,7 +278,7 @@ class Path::Backend
         end
       end
 
-      def lookup(path)
+      def lookup(_path)
         raise NotImplementError.new 'Subclass responsibility.'
       end
 
@@ -295,7 +295,7 @@ class Path::Backend
     class Dir < Node
       def initialize(backend, name, opts = {})
         super
-        self.mode = 0777 - backend.get_umask
+        self.mode = 0o777 - backend.get_umask
       end
 
       def lookup(path)
@@ -308,17 +308,15 @@ class Path::Backend
             lookup rest
           end
         else
-          child = children.find{|c| c.name == name }
+          child = children.find {|c| c.name == name }
           if child
             rest.nil? ? child : child.lookup(rest)
-          else
-            nil
           end
         end
       end
 
       def add(node)
-        if children.any?{|c| c.name == node.name }
+        if children.any? {|c| c.name == node.name }
           raise ArgumentError.new "Node #{path}/#{node.name} already exists."
         else
           children << node
@@ -345,10 +343,10 @@ class Path::Backend
 
       def initialize(backend, name, opts = {})
         super
-        self.mode = 0666 - backend.get_umask
+        self.mode = 0o666 - backend.get_umask
       end
 
-      def lookup(path)
+      def lookup(_path)
         nil
       end
     end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group File Operations
 
@@ -8,7 +9,7 @@ class Path
   def name
     ::File.basename internal_path
   end
-  alias_method :basename, :name
+  alias basename name
 
   # Create new file at pointed location or update modification time if file
   # exists.
@@ -71,9 +72,7 @@ class Path
   #
   def mkfile(*args)
     with_path(*args) do |path|
-      if !path.exists? && path.parent && !path.parent.exists?
-        path.parent.mkpath
-      end
+      path.parent.mkpath if !path.exists? && path.parent && !path.parent.exists?
 
       if path.exists?
         raise Errno::ENOENT.new path.to_s unless path.file?
@@ -165,7 +164,6 @@ class Path
   end
 
   class << self
-
     # Read or set process umask.
     #
     # @overload umask
@@ -187,6 +185,6 @@ class Path
         invoke_backend :get_umask
       end
     end
-    alias_method :umask=, :umask
+    alias umask= umask
   end
 end

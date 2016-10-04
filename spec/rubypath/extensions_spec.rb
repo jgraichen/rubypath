@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -17,7 +18,7 @@ describe Path do
         let(:path) { dotfile }
 
         it 'should not return dotfile name as extension' do
-          should eq Array.new
+          should eq []
         end
       end
 
@@ -112,11 +113,11 @@ describe Path do
       end
 
       shared_examples 'w/o ext' do
-        let(:exts)  { '' }
+        let(:exts) { '' }
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
-          subject{ path.send(described_method, 'txt' => 'html') }
+          subject { path.send(described_method, 'txt' => 'html') }
 
           it 'should replace all file extensions' do
             should eq "#{base}file"
@@ -127,7 +128,7 @@ describe Path do
       end
 
       shared_examples 'with single ext' do
-        let(:exts)  { '.txt' }
+        let(:exts) { '.txt' }
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do
@@ -142,7 +143,7 @@ describe Path do
       end
 
       shared_examples 'with multiple ext' do
-        let(:exts)  { '.en.html.slim' }
+        let(:exts) { '.en.html.slim' }
         it_behaves_like 'extensions replacement'
 
         context 'with replacement hash' do

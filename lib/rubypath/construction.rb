@@ -1,5 +1,5 @@
+# frozen_string_literal: true
 class Path
-
   class << self
     # @!group Construction
 
@@ -93,7 +93,7 @@ class Path
   def initialize(*args)
     parts = args.flatten
     @path = if parts.size > 1
-              ::File.join(*parts.map{|p| Path.like_path p })
+              ::File.join(*parts.map {|p| Path.like_path p })
             elsif parts.size == 1
               Path.like_path(parts.first).dup
             else

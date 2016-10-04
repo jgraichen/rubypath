@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group File Extensions
 
@@ -16,7 +17,7 @@ class Path
       name.split('.')[1..-1]
     end
   end
-  alias_method :exts, :extensions
+  alias exts extensions
 
   # Return last file extension.
   #
@@ -29,7 +30,7 @@ class Path
   def extension
     extensions.last
   end
-  alias_method :ext, :extension
+  alias ext extension
 
   # Return last file extension include dot character.
   #
@@ -125,12 +126,10 @@ class Path
 
     if extensions == self.extensions
       self
+    elsif only_filename?
+      Path "#{pure_name}.#{extensions.join('.')}"
     else
-      if only_filename?
-        Path "#{pure_name}.#{extensions.join('.')}"
-      else
-        dirname.join "#{pure_name}.#{extensions.join('.')}"
-      end
+      dirname.join "#{pure_name}.#{extensions.join('.')}"
     end
   end
 
@@ -153,5 +152,4 @@ class Path
 
     replace_extensions extensions
   end
-
 end

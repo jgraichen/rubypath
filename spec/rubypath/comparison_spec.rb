@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -57,7 +58,7 @@ describe Path do
 
         it 'should compare paths (1)' do
           res = path.send described_method,
-                          Pathname.new('/path/to/another/file')
+            Pathname.new('/path/to/another/file')
           expect(res).to be false
         end
 
@@ -68,7 +69,7 @@ describe Path do
 
         it 'should compare clean paths (2)' do
           res = path.send described_method,
-                          Pathname.new('/path/to/another/../file')
+            Pathname.new('/path/to/another/../file')
           expect(res).to be true
         end
       end

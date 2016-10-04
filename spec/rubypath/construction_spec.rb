@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -52,7 +53,7 @@ describe Path do
         end
 
         context 'w/o args' do
-          let(:args) { Array.new }
+          let(:args) { [] }
           it('should return Path::EMPTY') { should equal Path::EMPTY }
         end
       end
@@ -65,8 +66,16 @@ describe Path do
             'Path' => Path.new('/path/to/file.ext'),
             'Pathname' => Pathname.new('/path/to/file.ext'),
             'String' => '/path/to/file.ext',
-            '#to_path' => Class.new{ def to_path; '/path/to/file.ext' end }.new,
-            '#path' => Class.new{ def path; '/path/to/file.ext' end }.new
+            '#to_path' => Class.new do
+                            def to_path
+                              '/path/to/file.ext'
+                            end
+                          end.new,
+            '#path' => Class.new do
+                         def path
+                           '/path/to/file.ext'
+                         end
+                       end.new
           }.each do |name, example|
             let(:obj) { example.dup }
             it("should accept #{name}") { should be true }
@@ -82,8 +91,16 @@ describe Path do
             'Path' => Path.new('/path/to/file.ext'),
             'Pathname' => Pathname.new('/path/to/file.ext'),
             'String' => '/path/to/file.ext',
-            '#to_path' => Class.new{ def to_path; '/path/to/file.ext' end }.new,
-            '#path' => Class.new{ def path; '/path/to/file.ext' end }.new
+            '#to_path' => Class.new do
+                            def to_path;
+                              '/path/to/file.ext'
+                            end
+                          end.new,
+            '#path' => Class.new do
+                         def path;
+                           '/path/to/file.ext'
+                         end
+                       end.new
           }.each do |name, example|
             let(:obj) { example.dup }
             it("should get path from #{name}") { should eq '/path/to/file.ext' }

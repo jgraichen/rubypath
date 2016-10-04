@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 class Path
   class << self
-
     # Returns the current working directory.
     #
     # @return [Path] Current working directory.
@@ -64,7 +64,7 @@ class Path
       Path path
     end
   end
-  alias_method :mkdir_p, :mkpath
+  alias mkdir_p mkpath
 
   # Return list of entries in directory. That includes special directories
   # (`.`, `..`).
@@ -73,7 +73,7 @@ class Path
   #
   # @return [Array<Path>] Entries in directory.
   #
-  def entries(*args)
+  def entries(*_args)
     invoke_backend(:entries, internal_path).map(&Path)
   end
 
@@ -99,7 +99,7 @@ class Path
       Path path
     end
   end
-  alias_method :rm_rf, :rmtree
+  alias rm_rf rmtree
 
   # Removes file or directory. If it's a directory it will be removed
   # recursively.
@@ -135,7 +135,7 @@ class Path
       Path path
     end
   end
-  alias_method :rm_r, :rmtree!
+  alias rm_r rmtree!
 
   # Removes file or directory. If it's a directory it will be removed
   # recursively.

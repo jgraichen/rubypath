@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group Path Operations
 
@@ -128,9 +129,9 @@ class Path
     end
   end
 
-  alias_method :expand_path, :expand
-  alias_method :absolute, :expand
-  alias_method :absolute_path, :expand
+  alias expand_path expand
+  alias absolute expand
+  alias absolute_path expand
 
   # Check if path consists of only a filename.
   #
@@ -169,7 +170,7 @@ class Path
     dir.empty? ? nil : self.class.new(dir)
   end
 
-  alias_method :parent, :dirname
+  alias parent dirname
 
   # Yield given block for path and each ancestor.
   #
@@ -205,7 +206,7 @@ class Path
     self
   end
 
-  alias_method :each_ancestors, :ascend
+  alias each_ancestors ascend
 
   # Return an array of all ancestors.
   #
@@ -266,7 +267,8 @@ class Path
   # @see Pathname#relative_path_from
   #
   def relative_from(base)
-    base, path = Path(base).cleanpath, cleanpath
+    base = Path(base).cleanpath
+    path = cleanpath
 
     return Path '.' if base == path
 
@@ -275,12 +277,13 @@ class Path
         "Different prefix: #{base.inspect} and #{path.inspect}"
     end
 
-    base, path = base.components(empty: true), path.components(empty: true)
+    base = base.components(empty: true)
+    path = path.components(empty: true)
     base.shift && path.shift while base.first == path.first && !(base.empty? || path.empty?)
 
     Path(*((['..'] * base.size) + path))
   end
-  alias_method :relative_path_from, :relative_from
+  alias relative_path_from relative_from
 
   # Return cleaned path with all dot components removed.
   #

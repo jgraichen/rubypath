@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group Identity
 
@@ -8,9 +9,9 @@ class Path
   def path
     internal_path.dup
   end
-  alias_method :to_path, :path
-  alias_method :to_str, :path
-  alias_method :to_s, :path
+  alias to_path path
+  alias to_str path
+  alias to_s path
 
   # Return a useful object string representation.
   #
@@ -18,8 +19,6 @@ class Path
   def inspect
     "<#{self.class.name}:#{internal_path}>"
   end
-
-
 
   protected
 

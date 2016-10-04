@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module DescribeMethod
   def describe_aliases(*args, &block)
     args.each do |mth|
@@ -14,5 +15,5 @@ module DescribeMethod
     describe_aliases *([mth] + (opts[:aliases] || []).to_ary), &block
   end
 
-  RSpec.configure{|c| c.extend DescribeMethod }
+  RSpec.configure {|c| c.extend DescribeMethod }
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   class << self
     # @!group Mocking / Virtual File System
@@ -34,7 +35,7 @@ class Path
     # @yieldparam root [Path] Root path of current packend.
     # @yieldparam backend [Backend] Current backend.
     #
-    def mock(opts = {})
+    def mock(_opts = {})
       yield Path('/'), Backend.instance.backend if block_given?
       nil
     end

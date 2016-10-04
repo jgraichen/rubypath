@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rubypath/version'
 require 'tmpdir'
 
@@ -19,7 +20,6 @@ class Path
 
   require 'rubypath/mock'
   require 'rubypath/backend'
-
 end
 
 module Kernel

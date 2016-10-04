@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   # @!group File Predicates
 
@@ -18,8 +19,8 @@ class Path
   def exists?
     invoke_backend :exists?
   end
-  alias_method :exist?, :exists?
-  alias_method :existent?, :exists?
+  alias exist? exists?
+  alias existent? exists?
 
   # Check if path points to a directory.
   #

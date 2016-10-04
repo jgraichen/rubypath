@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Path do
@@ -91,7 +92,7 @@ describe Path do
       end
 
       context 'with block' do
-        let(:block) { proc{|fn| fn } }
+        let(:block) { proc {|fn| fn } }
 
         it 'should yield components' do
           expect do |b|
@@ -154,16 +155,16 @@ describe Path do
                                          :absolute, :absolute_path] do
         let(:cwd) { '/working/dir' }
         let(:base) { cwd }
-        let(:args) { Array.new }
+        let(:args) { [] }
         before do
-          Path.mock do |root, back|
+          Path.mock do |_root, back|
             back.cwd = cwd
             back.current_user = 'test'
             back.homes = {'test' => '/home/test', 'otto' => '/srv/home/otto'}
           end
         end
 
-        around{|example| Path::Backend.mock(&example) }
+        around {|example| Path::Backend.mock(&example) }
 
         shared_examples '#expand' do
           subject { Path(path).send(described_method, *args) }
@@ -320,46 +321,46 @@ describe Path do
       it { should eq '../../../one/two' }
 
       context 'with collapsing paths' do
-        let(:base) { Path '/path/one/two'  }
+        let(:base) { Path '/path/one/two' }
         let(:path) { Path '/path/one' }
         it { should eq '..' }
       end
 
       context 'with relative paths' do
-        let(:base) { Path 'path/one'  }
+        let(:base) { Path 'path/one' }
         let(:path) { Path 'path/two' }
         it { should eq '../two' }
       end
 
       context 'with mixed paths' do
-        let(:base) { Path '/root/path/one'  }
+        let(:base) { Path '/root/path/one' }
         let(:path) { Path 'path/two' }
-        subject { ->{ path.relative_from base } }
+        subject { -> { path.relative_from base } }
         it { should raise_error ArgumentError }
       end
 
       context 'with dots in path' do
-        let(:base) { Path '/path/one/three/../two'  }
+        let(:base) { Path '/path/one/three/../two' }
         let(:path) { Path '/path/one/two/six' }
         it { should eq 'six' }
       end
 
       context 'with same path (I)' do
-        let(:base) { Path '/path/one/two/six'  }
+        let(:base) { Path '/path/one/two/six' }
         let(:path) { Path '/path/one/two/six' }
         it { should eq '.' }
         it { expect(subject.to_s).to eq '.' }
       end
 
       context 'with same path (I)' do
-        let(:base) { Path '/'  }
+        let(:base) { Path '/' }
         let(:path) { Path '/' }
         it { should eq '.' }
         it { expect(subject.to_s).to eq '.' }
       end
 
       describe 'preserve trailing slash' do
-        let(:base) { Path('/blog/2014/06/my-blog-title-1/').dirname  }
+        let(:base) { Path('/blog/2014/06/my-blog-title-1/').dirname }
         let(:path) { Path '/blog/2014/07/another-blog-title/' }
         it { expect(subject.to_s).to eq '../07/another-blog-title/' }
       end
@@ -368,19 +369,19 @@ describe Path do
     describe_method :ascend, aliases: [:each_ancestors] do
       shared_examples 'ascend' do
         context 'with block' do
-          let(:block) { proc{} }
+          let(:block) { proc {} }
           subject { path.send described_method, &block }
 
           it { should eq path }
 
           it 'should yield part paths' do
-            expect{|b| path.send(described_method, &b) }
+            expect {|b| path.send(described_method, &b) }
               .to yield_successive_args(*expected_paths)
           end
 
           it 'should yield Path objects' do
-            expect{|b| path.send(described_method, &b) }
-              .to yield_successive_args(*expected_paths.map{ Path })
+            expect {|b| path.send(described_method, &b) }
+              .to yield_successive_args(*expected_paths.map { Path })
           end
         end
 
@@ -390,13 +391,13 @@ describe Path do
           it { should be_a Enumerator }
 
           it 'should yield part paths' do
-            expect{|b| subject.each(&b) }
+            expect {|b| subject.each(&b) }
               .to yield_successive_args(*expected_paths)
           end
 
           it 'should yield path objects' do
-            expect{|b| subject.each(&b) }
-              .to yield_successive_args(*expected_paths.map{ Path })
+            expect {|b| subject.each(&b) }
+              .to yield_successive_args(*expected_paths.map { Path })
           end
         end
       end
@@ -459,23 +460,23 @@ describe Path do
         it { should be_a Array }
 
         it 'should contain part paths' do
-          expect{|b| subject.each &b }.to yield_successive_args *expected_paths
+          expect {|b| subject.each(&b) }.to yield_successive_args *expected_paths
         end
 
         it 'should contain path objects' do
-          expect{|b| subject.each &b }.to yield_successive_args *expected_paths.map{ Path }
+          expect {|b| subject.each(&b) }.to yield_successive_args *expected_paths.map { Path }
         end
       end
 
       context 'with absolute path' do
         let(:path) { Path '/path/to/file.txt' }
-        let(:expected_paths) { %w(/path/to/file.txt /path/to /path /)}
+        let(:expected_paths) { %w(/path/to/file.txt /path/to /path /) }
         it_behaves_like 'ancestors'
       end
 
       context 'with relative path' do
         let(:path) { Path 'path/to/file.txt' }
-        let(:expected_paths) { %w(path/to/file.txt path/to path .)}
+        let(:expected_paths) { %w(path/to/file.txt path/to path .) }
         it_behaves_like 'ancestors'
       end
     end

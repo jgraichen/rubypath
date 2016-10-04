@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Path
   class Backend
     class << self
@@ -12,7 +13,7 @@ class Path
       end
 
       def mock(*args, &block)
-        self.instance.mock(*args, &block)
+        instance.mock(*args, &block)
       end
     end
 
@@ -38,7 +39,8 @@ class Path
     end
 
     def use_backend(be)
-      old_backend, self.backend = backend, be
+      old_backend = backend
+      self.backend = be
       yield
       backend.quit if backend.respond_to? :quit
       self.backend = old_backend
@@ -79,7 +81,6 @@ class Path
   end
 
   class << self
-
     private
 
     def invoke_backend(mth, *args)

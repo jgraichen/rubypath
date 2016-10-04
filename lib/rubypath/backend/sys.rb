@@ -1,8 +1,7 @@
+# frozen_string_literal: true
 class Path::Backend
-
   #
   class Sys
-
     def initialize(root = nil)
       @root  = ::File.expand_path root if root
       @umask = File.umask
@@ -112,13 +111,13 @@ class Path::Backend
       fs path, ::Dir, :entries, r(path)
     end
 
-    def glob(pattern, flags = 0, &block)
+    def glob(pattern, flags = 0)
       if block_given?
         fs pattern, ::Dir, :glob, r(pattern), flags do |path|
           yield ur(path)
         end
       else
-        fs(pattern, ::Dir, :glob, r(pattern), flags).map{|path| ur path }
+        fs(pattern, ::Dir, :glob, r(pattern), flags).map {|path| ur path }
       end
     end
 
@@ -131,7 +130,7 @@ class Path::Backend
     end
 
     def mode(path)
-      fs(path, ::File, :stat, r(path)).mode & 0777
+      fs(path, ::File, :stat, r(path)).mode & 0o777
     end
 
     def chmod(path, mode)
