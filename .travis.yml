@@ -2,7 +2,9 @@ sudo: false
 language: ruby
 cache: bundler
 rvm:
-- 2.1.1
+- 2.3.1
+- 2.2.5
+- 2.1.10
 - 2.0.0
 - 1.9.3
 - jruby
@@ -11,3 +13,7 @@ matrix:
   allow_failures:
     - rvm: jruby
     - rvm: rbx
+before_install:
+- rvm get head
+- rvm reload
+- rvm use --install $TRAVIS_RUBY_VERSION
