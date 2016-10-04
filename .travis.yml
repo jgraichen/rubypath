@@ -7,10 +7,13 @@ rvm:
 - 2.1.10
 - 2.0.0
 - 1.9.3
-- jruby-9
+- jruby-1.7.26
+- jruby-9.1.5.0
 matrix:
   allow_failures:
-    - rvm: jruby-9
+    - rvm: 1.9.3
+    - rvm: jruby-1.7.26
+    - rvm: jruby-9.1.5.0
 before_install:
 - rvm get head
 - rvm reload
