@@ -12,7 +12,7 @@ group :test do
 end
 
 group :development do
-  gem 'yard', '~> 0.8.6'
+  gem 'yard', '~> 0.9.9'
   gem 'redcarpet', platform: :ruby
 end
 
