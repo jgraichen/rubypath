@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -18,24 +19,24 @@ describe Path do
           subject { ->(*args) { Path.glob(*args) } }
 
           it 'should return matching files (I)' do
-            expect(subject.call('/*')).to match_array %w(/file.txt /lib)
+            expect(subject.call('/*')).to match_array %w[/file.txt /lib]
           end
 
           it 'should return matching files (II)' do
             expect(subject.call('/**/*.rb')).to match_array \
-              %w(/lib/path.rb /lib/path/dir.rb
-                 /lib/path/file.rb /lib/path/ext.rb)
+              %w[/lib/path.rb /lib/path/dir.rb
+                 /lib/path/file.rb /lib/path/ext.rb]
           end
 
           if defined?(::File::FNM_EXTGLOB)
             it 'should return matching files (III)' do
               expect(subject.call('/**/{dir,ext}.rb')).to match_array \
-                %w(/lib/path/dir.rb /lib/path/ext.rb)
+                %w[/lib/path/dir.rb /lib/path/ext.rb]
             end
           end
 
           it 'should return matching files (IV)' do
-            expect(subject.call('/lib/*.rb')).to match_array %w(/lib/path.rb)
+            expect(subject.call('/lib/*.rb')).to match_array %w[/lib/path.rb]
           end
         end
       end
@@ -43,17 +44,23 @@ describe Path do
       shared_examples '#remove_recursive' do
         context 'on existent file' do
           before { path.mkfile }
-          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
+          it do
+            expect { subject }.to change(path, :exist?).from(true).to(false)
+          end
         end
 
         context 'on existent directory' do
           before { path.mkpath }
-          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
+          it do
+            expect { subject }.to change(path, :exist?).from(true).to(false)
+          end
         end
 
         context 'on existent directory with children' do
           before { path.mkfile('subdir/file') }
-          it { expect { subject }.to change(path, :exist?).from(true).to(false) }
+          it do
+            expect { subject }.to change(path, :exist?).from(true).to(false)
+          end
         end
       end
 
@@ -205,7 +212,7 @@ describe Path do
           end
 
           it 'should list of entries' do
-            expect(subject).to match_array %w(.. . file.a file.b dir.a dir.b)
+            expect(subject).to match_array %w[.. . file.a file.b dir.a dir.b]
           end
 
           it 'should return list of Path objects' do

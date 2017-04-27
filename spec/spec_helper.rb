@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rspec'
 
 if ENV['CI'] || (defined?(:RUBY_ENGINE) && RUBY_ENGINE != 'rbx')

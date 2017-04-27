@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -8,7 +9,7 @@ describe Path do
     let(:path) { described_class.new(*args) }
     subject { path }
 
-    describe_method :path, aliases: [:to_path, :to_s] do
+    describe_method :path, aliases: %i[to_path to_s] do
       subject { path.send described_method }
 
       it { should eq str }
@@ -21,13 +22,13 @@ describe Path do
 
     describe '#initialize' do
       context 'w/o args' do
-        let(:args) { %w() }
+        let(:args) { %w[] }
         it { expect(subject.path).to eq '' }
         it { should be_a Path }
       end
 
       context 'with multiple strings' do
-        let(:args) { %w(path to a file.txt) }
+        let(:args) { %w[path to a file.txt] }
         it { expect(subject.path).to eq 'path/to/a/file.txt' }
         it { should be_a Path }
       end
@@ -70,7 +71,7 @@ describe Path do
                             def to_path
                               '/path/to/file.ext'
                             end
-                          end.new,
+                          end.new, # rubocop:disable MultilineBlockChain
             '#path' => Class.new do
                          def path
                            '/path/to/file.ext'
@@ -95,7 +96,7 @@ describe Path do
                             def to_path;
                               '/path/to/file.ext'
                             end
-                          end.new,
+                          end.new, # rubocop:disable MultilineBlockChain
             '#path' => Class.new do
                          def path;
                            '/path/to/file.ext'
@@ -110,7 +111,8 @@ describe Path do
 
       describe '#to_proc' do
         it 'should allow to use Path as block' do
-          expect(%w(path1 path2).map(&Path)).to eq [Path('path1'), Path('path2')]
+          expect(%w[path1 path2].map(&Path)).to eq \
+            [Path('path1'), Path('path2')]
         end
       end
     end

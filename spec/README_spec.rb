@@ -1,4 +1,6 @@
+# rubocop:disable FileName
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'README examples' do
@@ -19,7 +21,7 @@ describe 'README examples' do
 
     it 'should mock all FS' do
       base = Path('~test').expand
-      expect(base.join(%w(src test.txt)).read).to eq 'CONTENT'
+      expect(base.join(%w[src test.txt]).read).to eq 'CONTENT'
 
       files = base.glob('**/*').select(&:file?)
       expect(files.size).to eq 2

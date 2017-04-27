@@ -1,9 +1,8 @@
 # frozen_string_literal: true
+
 require 'rubypath/version'
 require 'tmpdir'
 
-#
-#
 #
 class Path
   require 'rubypath/identity'
@@ -23,7 +22,8 @@ class Path
 end
 
 module Kernel
+  # rubocop:disable Style/MethodName
   def Path(*args)
-    Path.new *args
+    Path.new(*args)
   end
 end

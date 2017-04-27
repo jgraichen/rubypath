@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -36,14 +37,16 @@ describe Path do
 
       context 'without args' do
         it 'should invoke backend with current path' do
-          expect(Path::Backend.instance).to receive(:mountpoint?).with('/tmp').and_return(false)
+          expect(Path::Backend.instance).to \
+            receive(:mountpoint?).with('/tmp').and_return(false)
           path.mountpoint?
         end
       end
 
       context 'with args' do
         it 'should invoke backend with joined path' do
-          expect(Path::Backend.instance).to receive(:mountpoint?).with('/tmp/fuu').and_return(false)
+          expect(Path::Backend.instance).to \
+            receive(:mountpoint?).with('/tmp/fuu').and_return(false)
           path.mountpoint?('fuu')
         end
       end

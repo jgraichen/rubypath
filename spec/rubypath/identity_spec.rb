@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -8,7 +9,7 @@ describe Path do
     let(:path) { described_class.new(*args) }
     subject { path }
 
-    describe_method :path, aliases: [:to_path, :to_str, :to_s] do
+    describe_method :path, aliases: %i[to_path to_str to_s] do
       subject { path.send described_method }
 
       it { should eq str }

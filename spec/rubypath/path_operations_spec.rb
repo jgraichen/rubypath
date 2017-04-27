@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -73,21 +74,21 @@ describe Path do
 
     describe_method :each_component do
       let(:block) { nil }
-      let(:opts) { Hash.new }
+      let(:opts) { {} }
       let(:str) { '/path/to/templates/dir/' }
       subject { path.send described_method, opts, &block }
 
       it { should be_a Enumerator }
 
       it 'should return all components' do
-        expect(subject.to_a).to eq %w(path to templates dir)
+        expect(subject.to_a).to eq %w[path to templates dir]
       end
 
       context 'with empty option' do
         let(:opts) { {empty: true} }
 
         it 'should also return empty path components' do
-          expect(subject.to_a).to eq([''] + %w(path to templates dir) + [''])
+          expect(subject.to_a).to eq([''] + %w[path to templates dir] + [''])
         end
       end
 
@@ -97,7 +98,7 @@ describe Path do
         it 'should yield components' do
           expect do |b|
             path.send described_method, &b
-          end.to yield_successive_args(*%w(path to templates dir))
+          end.to yield_successive_args('path', 'to', 'templates', 'dir')
         end
 
         it { should eq path }
@@ -109,7 +110,7 @@ describe Path do
       subject { path.send described_method }
 
       it { should be_a Array }
-      it { should eq %w(path to templates index.html) }
+      it { should eq %w[path to templates index.html] }
 
       context 'with should include leading empty components' do
         let(:str) { 'path/to/dir/' }
@@ -151,8 +152,8 @@ describe Path do
     end
 
     with_backends :mock, :sys do
-      describe_method :expand, aliases: [:expand_path,
-                                         :absolute, :absolute_path] do
+      describe_method :expand, aliases: %i[expand_path
+                                           absolute absolute_path] do
         let(:cwd) { '/working/dir' }
         let(:base) { cwd }
         let(:args) { [] }
@@ -404,13 +405,13 @@ describe Path do
 
       context 'with absolute path' do
         let(:path) { Path '/path/to/file.txt' }
-        let(:expected_paths) { %w(/path/to/file.txt /path/to /path /) }
+        let(:expected_paths) { %w[/path/to/file.txt /path/to /path /] }
         it_behaves_like 'ascend'
       end
 
       context 'with relative path' do
         let(:path) { Path 'path/to/file.txt' }
-        let(:expected_paths) { %w(path/to/file.txt path/to path .) }
+        let(:expected_paths) { %w[path/to/file.txt path/to path .] }
         it_behaves_like 'ascend'
       end
     end
@@ -460,23 +461,25 @@ describe Path do
         it { should be_a Array }
 
         it 'should contain part paths' do
-          expect {|b| subject.each(&b) }.to yield_successive_args *expected_paths
+          expect {|b| subject.each(&b) }.to \
+            yield_successive_args(*expected_paths)
         end
 
         it 'should contain path objects' do
-          expect {|b| subject.each(&b) }.to yield_successive_args *expected_paths.map { Path }
+          expect {|b| subject.each(&b) }.to \
+            yield_successive_args(*expected_paths.map { Path })
         end
       end
 
       context 'with absolute path' do
         let(:path) { Path '/path/to/file.txt' }
-        let(:expected_paths) { %w(/path/to/file.txt /path/to /path /) }
+        let(:expected_paths) { %w[/path/to/file.txt /path/to /path /] }
         it_behaves_like 'ancestors'
       end
 
       context 'with relative path' do
         let(:path) { Path 'path/to/file.txt' }
-        let(:expected_paths) { %w(path/to/file.txt path/to path .) }
+        let(:expected_paths) { %w[path/to/file.txt path/to path .] }
         it_behaves_like 'ancestors'
       end
     end

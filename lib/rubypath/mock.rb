@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   class << self
     # @!group Mocking / Virtual File System

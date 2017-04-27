@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   # @!group File Operations
 
@@ -70,7 +71,7 @@ class Path
   #
   # @return [Path] Path to created or existent file.
   #
-  def mkfile(*args)
+  def mkfile(*args) # rubocop:disable AbcSize
     with_path(*args) do |path|
       path.parent.mkpath if !path.exists? && path.parent && !path.parent.exists?
 
@@ -104,7 +105,7 @@ class Path
   #   Defaults to `File::FNM_EXTGLOB`.
   # @return [Path] Path to found file or nil.
   #
-  def lookup(pattern, flags = nil)
+  def lookup(pattern, flags = nil) # rubocop:disable MethodLength
     flags = self.class.default_glob_flags(flags)
 
     expand.ascend do |path|
@@ -115,7 +116,7 @@ class Path
           end
         when Regexp
           path.entries.each do |c|
-            return path.join(c) if pattern =~ c.name
+            return path.join(c) if pattern.match?(c.name)
           end
       end
     end
@@ -180,9 +181,9 @@ class Path
     #
     def umask(mask = nil)
       if mask
-        invoke_backend :set_umask, mask
+        invoke_backend :umask=, mask
       else
-        invoke_backend :get_umask
+        invoke_backend :umask
       end
     end
     alias umask= umask

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   # @!group Comparison
 
@@ -12,8 +13,8 @@ class Path
   def eql?(other)
     if other.is_a?(Path)
       cleanpath.internal_path == other.cleanpath.internal_path
-    else
-      Path.new(other).eql?(self) if Path.like?(other)
+    elsif Path.like?(other)
+      Path.new(other).eql?(self)
     end
   end
   alias == eql?

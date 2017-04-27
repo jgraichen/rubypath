@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 
@@ -10,8 +11,10 @@ begin
   require 'yard/rake/yardoc_task'
 
   YARD::Rake::YardocTask.new do |t|
-    t.files = %w(lib/**/*.rb)
-    t.options = %w(--output-dir doc/)
+    t.files = %w[lib/**/*.rb]
+    t.options = %w[--output-dir doc/]
   end
+# rubocop:disable Lint/HandleExceptions
 rescue LoadError
+  # noop
 end

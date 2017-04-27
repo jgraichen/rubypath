@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -11,7 +12,7 @@ describe Path do
       subject { path.send described_method }
 
       it 'should return all file extensions' do
-        should eq %w(de html slim)
+        should eq %w[de html slim]
       end
 
       context 'dotfile w/o ext' do
@@ -26,7 +27,7 @@ describe Path do
         let(:path) { dotfile_ext }
 
         it 'should only return dotfile extension' do
-          should eq %w(en sh)
+          should eq %w[en sh]
         end
       end
     end
@@ -92,7 +93,7 @@ describe Path do
 
       shared_examples 'extensions replacement' do
         context 'with array' do
-          subject { path.send described_method, %w(en txt) }
+          subject { path.send described_method, %w[en txt] }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.en.txt"
@@ -102,7 +103,7 @@ describe Path do
         end
 
         context 'with multiple arguments' do
-          subject { path.send described_method, *%w(en txt) }
+          subject { path.send described_method, 'en', 'txt' }
 
           it 'should replace all file extensions' do
             should eq "#{base}file.en.txt"
@@ -191,7 +192,7 @@ describe Path do
 
       shared_examples 'extension replacement' do
         context 'with array' do
-          subject { path.send described_method, %w(mobile txt) }
+          subject { path.send described_method, %w[mobile txt] }
 
           it 'should replace last file extensions' do
             should eq "#{base}#{file}.mobile.txt"
@@ -201,7 +202,7 @@ describe Path do
         end
 
         context 'with multiple arguments' do
-          subject { path.send described_method, *%w(mobile txt) }
+          subject { path.send described_method, 'mobile', 'txt' }
 
           it 'should replace last file extensions' do
             should eq "#{base}#{file}.mobile.txt"

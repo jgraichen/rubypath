@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -155,7 +156,7 @@ describe Path do
         it_behaves_like '#mkfile'
 
         context 'with args' do
-          let(:args) { %w(sub file) }
+          let(:args) { %w[sub file] }
           let(:expected_path) { Path '/path/to/file.txt/sub/file' }
 
           it_behaves_like '#mkfile'
@@ -215,7 +216,7 @@ describe Path do
           end
 
           it 'should find file in parent directory' do
-            expect(path.join(%w(a b)).send(described_method, 'test.txt'))
+            expect(path.join(%w[a b]).send(described_method, 'test.txt'))
               .to eq path.join('a/test.txt').expand
           end
 
@@ -310,10 +311,10 @@ describe Path do
         end
 
         context 'with modification time changed' do
-          before { path.mtime = Time.new(2175, 12, 24, 18, 0o0, 30) }
+          before { path.mtime = Time.new(2175, 12, 24, 18, 0, 30) }
 
           it 'should return file modification time' do
-            should eq Time.new(2175, 12, 24, 18, 0o0, 30)
+            should eq Time.new(2175, 12, 24, 18, 0, 30)
           end
         end
       end
@@ -321,10 +322,13 @@ describe Path do
       describe_method :mtime= do
         let(:path) { Path '/file.txt' }
         before { path.touch }
-        subject { path.send described_method, Time.new(2175, 12, 24, 18, 0o0, 30) }
+        subject do
+          path.send described_method, Time.new(2175, 12, 24, 18, 0, 30)
+        end
 
         it 'should change file modification time' do
-          expect { subject }.to change { path.mtime }.to Time.new(2175, 12, 24, 18, 0o0, 30)
+          expect { subject }.to change { path.mtime }.to \
+            Time.new(2175, 12, 24, 18, 0, 30)
         end
       end
 
@@ -349,10 +353,10 @@ describe Path do
           end
 
           context 'and changed access time' do
-            before { path.atime = Time.new(2175, 12, 24, 18, 0o0, 30) }
+            before { path.atime = Time.new(2175, 12, 24, 18, 0, 30) }
 
             it 'should return file access time' do
-              should eq Time.new(2175, 12, 24, 18, 0o0, 30)
+              should eq Time.new(2175, 12, 24, 18, 0, 30)
             end
           end
         end
@@ -361,10 +365,13 @@ describe Path do
       describe_method :atime= do
         let(:path) { Path '/file.txt' }
         before { path.touch }
-        subject { path.send described_method, Time.new(2175, 12, 24, 18, 0o0, 30) }
+        subject do
+          path.send described_method, Time.new(2175, 12, 24, 18, 0, 30)
+        end
 
         it 'should change file access time' do
-          expect { subject }.to change { path.atime }.to Time.new(2175, 12, 24, 18, 0o0, 30)
+          expect { subject }.to change { path.atime }.to \
+            Time.new(2175, 12, 24, 18, 0, 30)
         end
       end
 

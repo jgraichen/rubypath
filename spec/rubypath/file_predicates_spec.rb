@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -44,7 +45,7 @@ describe Path do
         end
       end
 
-      describe_method :exists?, aliases: [:exist?, :existent?] do
+      describe_method :exists?, aliases: %i[exist? existent?] do
         let(:path) { Path '/file' }
         subject { path.send described_method }
 

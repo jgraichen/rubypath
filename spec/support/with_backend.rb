@@ -1,7 +1,8 @@
 # frozen_string_literal: true
+
 #
 module WithBackend
-  def with_backends(*args, &block)
+  def with_backends(*args, &block) # rubocop:disable AbcSize, MethodLength
     args.each do |backend|
       be = case backend
              when :mock

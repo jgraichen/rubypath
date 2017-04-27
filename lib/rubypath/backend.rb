@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   class Backend
     class << self
@@ -22,6 +23,7 @@ class Path
       self.backend = Backend::Sys.new
     end
 
+    # rubocop:disable Metrics/MethodLength
     def mock(opts = {}, &block)
       if opts[:root]
         # Use real file system scoped to given directory (chroot like)
@@ -37,6 +39,7 @@ class Path
         use_backend Backend::Mock.new, &block
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     def use_backend(be)
       old_backend = backend
@@ -62,8 +65,8 @@ class Path
     delegate :glob
     delegate :atime
     delegate :atime=
-    delegate :get_umask
-    delegate :set_umask
+    delegate :umask
+    delegate :umask=
     delegate :mode
     delegate :chmod
     delegate :unlink

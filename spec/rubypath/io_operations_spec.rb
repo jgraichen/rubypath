@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Path do
@@ -44,7 +45,8 @@ describe Path do
           before { path.mkdir }
 
           it 'should raise EISDIR error' do
-            expect { subject }.to raise_error(Errno::EISDIR, 'Is a directory - /file')
+            expect { subject }.to raise_error \
+              Errno::EISDIR, 'Is a directory - /file'
           end
         end
 
@@ -52,7 +54,8 @@ describe Path do
           before { expect(path).to_not be_existent }
 
           it 'should raise ENOENT error' do
-            expect { subject }.to raise_error(Errno::ENOENT, 'No such file or directory - /file')
+            expect { subject }.to raise_error \
+              Errno::ENOENT, 'No such file or directory - /file'
           end
         end
       end
@@ -81,12 +84,12 @@ describe Path do
           it_behaves_like '#write'
 
           it 'should update mtime' do
-            expect { subject }.to change { path.mtime }
+            expect { subject }.to(change { path.mtime })
             expect(path.mtime).to be_within(delta).of(Time.now)
           end
 
           it 'should not update atime' do
-            expect { subject }.to_not change { path.atime }
+            expect { subject }.to_not(change { path.atime })
           end
 
           context 'with offset' do
@@ -102,7 +105,8 @@ describe Path do
           before { path.mkdir }
 
           it 'should write content' do
-            expect { subject }.to raise_error(Errno::EISDIR, 'Is a directory - /file')
+            expect { subject }.to raise_error \
+              Errno::EISDIR, 'Is a directory - /file'
           end
         end
 

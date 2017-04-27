@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   class << self
     # @!group Construction
@@ -30,6 +31,8 @@ class Path
     #
     # @return [Boolean] True if object is path like, false otherwise.
     #
+    # rubocop:disable Metrics/CyclomaticComplexity
+    #
     def like?(obj)
       return true if obj.is_a?(self)
       return true if obj.is_a?(String)
@@ -37,6 +40,7 @@ class Path
       return true if obj.respond_to?(:path) && obj.path.is_a?(String)
       false
     end
+    # rubocop:enable all
 
     # Convert given object to path string using {::Path.like?} rules.
     #
@@ -46,12 +50,13 @@ class Path
     # @raise [ArgumentError] If given object is not {::Path.like?}.
     # @see ::Path.like?
     #
+    # rubocop:disable Metrics/MethodLength
     def like_path(obj)
       case obj
         when String
           return obj
         else
-          [:to_path, :path, :to_str, :to_s].each do |mth|
+          %i[to_path path to_str to_s].each do |mth|
             if obj.respond_to?(mth) && obj.send(mth).is_a?(String)
               return obj.send(mth)
             end
@@ -61,6 +66,7 @@ class Path
       raise ArgumentError.new \
         "Argument #{obj.inspect} cannot be converted to path string."
     end
+    # rubocop:enable all
 
     # Return system file path separator.
     #

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Path
   # @!group File Extensions
 
@@ -100,12 +101,17 @@ class Path
   #   Replace all matching extensions.
   #
   #   @example
-  #     Path('file.de.html.haml').replace_extensions('de' => 'en', 'haml' => 'slim')
+  #     Path('file.de.html.haml').replace_extensions('de'=>'en', 'haml'=>'slim')
   #     #=> <Path "file.en.html.slim">
   #
   #   @param map [Hash<String, String>] Translation map as hash.
   #
   # @return [Path] Path to new filename.
+  #
+  # rubocop:disable AbcSize
+  # rubocop:disable CyclomaticComplexity
+  # rubocop:disable MethodLength
+  # rubocop:disable PerceivedComplexity
   #
   def replace_extensions(*args)
     args.flatten!
@@ -132,6 +138,7 @@ class Path
       dirname.join "#{pure_name}.#{extensions.join('.')}"
     end
   end
+  # rubocop:enable all
 
   # Replace last extension with one or multiple new extensions.
   #

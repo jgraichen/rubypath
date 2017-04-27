@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-class Path
+
+class Path # rubocop:disable ClassLength
   # @!group Path Operations
 
   # Join path with given arguments.
@@ -164,7 +165,7 @@ class Path
   #   or relative root.
   #
   def dirname
-    return nil if %w(. /).include? internal_path
+    return nil if %w[. /].include? internal_path
 
     dir = ::File.dirname internal_path
     dir.empty? ? nil : self.class.new(dir)
@@ -229,7 +230,7 @@ class Path
   # @return [Path] Path transformed to relative path.
   #
   def as_relative
-    if (rel_path = internal_path.gsub(/^\/+/, '')) != internal_path
+    if (rel_path = internal_path.gsub(%r{^/+}, '')) != internal_path
       Path rel_path
     else
       self
@@ -266,6 +267,12 @@ class Path
   # @return [Path] Relative path from argument to receiver.
   # @see Pathname#relative_path_from
   #
+  # rubocop:disable AbcSize
+  # rubocop:disable CyclomaticComplexity
+  # rubocop:disable MethodLength
+  # rubocop:disable PerceivedComplexity
+  # rubocop:disable LineLength
+  #
   def relative_from(base)
     base = Path(base).cleanpath
     path = cleanpath
@@ -284,6 +291,7 @@ class Path
     Path(*((['..'] * base.size) + path))
   end
   alias relative_path_from relative_from
+  # rubocop:enable all
 
   # Return cleaned path with all dot components removed.
   #
@@ -303,12 +311,10 @@ class Path
     path = Pathname.new(self).cleanpath
     if path == internal_path
       self
+    elsif internal_path[-1] == Path.separator
+      Path path, ''
     else
-      if internal_path[-1] == Path.separator
-        Path path, ''
-      else
-        Path path
-      end
+      Path path
     end
   end
 end
