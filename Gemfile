@@ -14,6 +14,7 @@ end
 group :development do
   gem 'yard', '~> 0.9.9'
   gem 'redcarpet', platform: :ruby
+  gem 'rubocop'
 end
 
 # Specify your gem's dependencies in ruby-path.gemspec

@@ -1,10 +1,5 @@
 AllCops:
-  Include:
-    - '**/*.gemspec'
-    - '**/Rakefile'
-  Exclude:
-    - 'bin/**'
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.4
 
 Rails:
   Enabled: false
@@ -21,9 +16,6 @@ Style/SpaceInsideHashLiteralBraces:
 Style/RaiseArgs:
   EnforcedStyle: compact
 
-Style/Documentation:
-  Enabled: false
-
 Style/SpaceInsideBlockBraces:
   EnforcedStyle: space
   EnforcedStyleForEmptyBraces: no_space
@@ -33,7 +25,7 @@ Style/SignalException:
   EnforcedStyle: only_raise
 
 Style/CaseIndentation:
-  IndentWhenRelativeTo: end
+  EnforcedStyle: end
   SupportedStyles:
     - case
     - end
@@ -42,19 +34,18 @@ Style/CaseIndentation:
 Style/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
-Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
-
-Metrics/LineLength:
-  Exclude:
-    - '**/*_spec.rb'
-    - 'spec/factories.rb'
-
 Style/Semicolon:
   Exclude:
     - '**/*_spec.rb'
 
 Style/RescueModifier:
+  Exclude:
+    - '**/*_spec.rb'
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/BlockLength:
   Exclude:
     - '**/*_spec.rb'
 
