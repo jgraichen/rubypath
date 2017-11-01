@@ -1,5 +1,9 @@
 # Changes
 
+## 1.0.1
+
+* Fix issues with gem packaging
+
 ## 1.0.0
 
 * Dump to semantic versioning
