@@ -116,13 +116,15 @@ class Path
           end
         when Regexp
           path.entries.each do |c|
-            return path.join(c) if pattern.match?(c.name)
+            # rubocop:disable RegexpMatch
+            return path.join(c) if pattern =~ c.name
           end
       end
     end
 
     nil
   end
+  # rubocop:enable all
 
   # Return file modification time.
   #
