@@ -1,5 +1,10 @@
 # Changes
 
+## 1.0.0
+
+* Dump to semantic versioning
+* Internal code style changes
+
 ## 0.3.2
 
 * Fix infinite loop bug in #relative_from
