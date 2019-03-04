@@ -1,21 +1,13 @@
-sudo: false
-dist: trusty
+dist: xenial
 cache: bundler
 language: ruby
 rvm:
-- '2.5.0-preview1'
-- '2.4.2'
-- '2.3.5'
-- '2.2.8'
-- '2.1.10'
-- jruby-1.7.27
-- jruby-9.1.13.0
+- 2.6.1
+- 2.5.3
+- 2.4.5
+- 2.3.8
+- jruby-9.2.6.0
 matrix:
   allow_failures:
-    - rvm: 2.5.0-preview1
-    - rvm: jruby-1.7.27
-    - rvm: jruby-9.1.13.0
+    - rvm: jruby-9.2.6.0
   fast_finish: true
-before_install:
-- gem update --system
-- gem install bundler
